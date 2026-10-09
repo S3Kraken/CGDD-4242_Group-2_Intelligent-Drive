@@ -35,6 +35,6 @@ public class CarController : MonoBehaviour
 
     private void Update()
     {
-        Drive(testSteer, testThrottle);
+        //Drive(testSteer, testThrottle);
     }
 }
