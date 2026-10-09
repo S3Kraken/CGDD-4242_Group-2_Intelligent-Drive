@@ -10,13 +10,13 @@ public class PacifistObstacleAvoidance : MonoBehaviour
 
     private float forwardDistance = 20f;
     private float sideDistance = 14f;
-    private float sensorRadius = 1f;
+    private float sensorRadius = 1.5f;
     private float sideAngle = 45f;
 
-    public float vehicleDetectionDistance = 30f;
-    public float rearDetectionDistance = 24f;
-    public float rearSideDistance = 24f;
-    public float rearSideAngle = 45f;
+    private float vehicleDetectionDistance = 25f;
+    private float rearDetectionDistance = 14f;
+    private float rearSideDistance = 14f;
+    private float rearSideAngle = 45f;
 
 
     public bool ObstacleAhead { get; private set; }
@@ -24,6 +24,8 @@ public class PacifistObstacleAvoidance : MonoBehaviour
     public bool RightBlocked { get; private set; }
     public bool CarAhead { get; private set; }
     public float DistanceToCar { get; private set; }
+    public bool LeftBlockedCar { get; private set; }
+    public bool RightBlockedCar { get; private set; }
     public bool CarBehind { get; private set; }
     public float DistanceToCarBehind { get; private set; }
     public bool RearLeftBlocked { get; private set; }
@@ -39,7 +41,6 @@ public class PacifistObstacleAvoidance : MonoBehaviour
         CheckForObstacles();
         CheckForCars();
         CheckForCarsBehind();
-        CheckRearSides();
     }
 
     void CheckForObstacles()
@@ -92,6 +93,18 @@ public class PacifistObstacleAvoidance : MonoBehaviour
         Vector3 origin = sensorOrigin.position;
         Vector3 forward = transform.forward;
 
+        Vector3 left = Quaternion.AngleAxis(-sideAngle, transform.up) * forward;
+
+        Vector3 right = Quaternion.AngleAxis(sideAngle, transform.up) * forward;
+
+        LeftBlockedCar = Physics.SphereCast(origin, sensorRadius, left, out _, sideDistance, driverMask, QueryTriggerInteraction.Ignore);
+
+        RightBlockedCar = Physics.SphereCast(origin, sensorRadius, right, out _, sideDistance, driverMask, QueryTriggerInteraction.Ignore);
+
+        Debug.DrawRay(origin, left * sideDistance, LeftBlockedCar ? Color.yellow : Color.green);
+
+        Debug.DrawRay(origin, right * sideDistance, RightBlockedCar ? Color.yellow : Color.green);
+
         if (Physics.SphereCast(origin, sensorRadius, forward, out RaycastHit hit, vehicleDetectionDistance, driverMask, QueryTriggerInteraction.Ignore))
         {
             CarAhead = true;
@@ -112,6 +125,18 @@ public class PacifistObstacleAvoidance : MonoBehaviour
         Vector3 origin = sensorOrigin.position;
         Vector3 backward = -transform.forward;
 
+        Vector3 rearLeft = Quaternion.AngleAxis(-rearSideAngle, transform.up) * backward;
+
+        Vector3 rearRight = Quaternion.AngleAxis(rearSideAngle, transform.up) * backward;
+
+        RearLeftBlocked = Physics.SphereCast(origin, sensorRadius, rearLeft, out RaycastHit leftHit, rearSideDistance, driverMask, QueryTriggerInteraction.Ignore);
+
+        RearRightBlocked = Physics.SphereCast(origin, sensorRadius, rearRight, out RaycastHit rightHit, rearSideDistance, driverMask, QueryTriggerInteraction.Ignore);
+
+        Debug.DrawRay(origin, rearLeft * rearSideDistance, RearLeftBlocked ? Color.magenta : Color.green);
+
+        Debug.DrawRay(origin, rearRight * rearSideDistance, RearRightBlocked ? Color.magenta : Color.green);
+
         if (Physics.SphereCast( origin, sensorRadius, backward, out RaycastHit hit, rearDetectionDistance, driverMask, QueryTriggerInteraction.Ignore))
         {
             CarBehind = true;
@@ -127,21 +152,5 @@ public class PacifistObstacleAvoidance : MonoBehaviour
             Debug.DrawRay(origin, backward * rearDetectionDistance, Color.green);
         }
     }
-    void CheckRearSides()
-    {
-        Vector3 origin = sensorOrigin.position;
-        Vector3 backward = -transform.forward;
-
-        Vector3 rearLeft = Quaternion.AngleAxis(-rearSideAngle, transform.up) * backward;
-
-        Vector3 rearRight = Quaternion.AngleAxis(rearSideAngle, transform.up) * backward;
-
-        RearLeftBlocked = Physics.SphereCast(origin, sensorRadius, rearLeft, out RaycastHit leftHit, rearSideDistance, driverMask,QueryTriggerInteraction.Ignore);
-
-        RearRightBlocked = Physics.SphereCast(origin, sensorRadius, rearRight, out RaycastHit rightHit, rearSideDistance, driverMask, QueryTriggerInteraction.Ignore);
-
-        Debug.DrawRay(origin, rearLeft * rearSideDistance, RearLeftBlocked ? Color.magenta : Color.green);
-
-        Debug.DrawRay(origin, rearRight * rearSideDistance, RearRightBlocked ? Color.magenta : Color.green);
-    }
+    
 }

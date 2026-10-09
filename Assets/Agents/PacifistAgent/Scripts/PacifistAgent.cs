@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PacifistAgent : MonoBehaviour
@@ -12,27 +13,45 @@ public class PacifistAgent : MonoBehaviour
     private int currentWaypointIndex;
     private int nextWaypointIndex;
 
+    //this is only for the pacifist agent
+    #region Pacifist variables
     private PacifistObstacleAvoidance pAvoidance;
     private float avoidanceTimer = 0f;
     private float avoidanceDuration = 0.5f;
     private float avoidanceTurn = 0f;
     private float yieldTimer = 0f;
     private float yieldDuration = 0.5f;
-    private float yieldTurn = 0f;
+    #endregion
+
+    //this is if you want the collision recovery
+    #region collision recovery variables
+    private int collisionsCount = 0;
+    private bool recoveringFromCollision = false;
+
+    public float recoveryReverseTime = 1.0f;
+    public float recoveryTurnTime = 0.75f;
+    #endregion
 
     void Start()
     {
         carController = GetComponent<CarController>();
         waypointPath = FindAnyObjectByType<WaypointPath>();
-        pAvoidance = GetComponent<PacifistObstacleAvoidance>();
         currentWaypointIndex = waypointPath.CurrentIndex;
         nextWaypointIndex = waypointPath.NextIndex;
 
-}
+        pAvoidance = GetComponent<PacifistObstacleAvoidance>();
+    }
 
     // Update is called once per frame
     void Update()
     {
+        if (recoveringFromCollision)
+        {
+            return;
+        }
+
+
+        //Basic Driver Waypoint following
         if (waypointPath.GetCurrentWaypoint(currentWaypointIndex) != null)
         {
             SetWaypoint(waypointPath.GetCurrentWaypoint(currentWaypointIndex).position);
@@ -73,6 +92,9 @@ public class PacifistAgent : MonoBehaviour
             {
                 turnAmount = -1f;
             }
+
+
+
             //This is the PACIFIST behaviour. If copying the waypoint code, remove this region.
             #region pacifist behaviour
 
@@ -116,11 +138,11 @@ public class PacifistAgent : MonoBehaviour
             {
                 yieldTimer = yieldDuration;
 
-                if (!pAvoidance.LeftBlocked)
+                if (!pAvoidance.LeftBlockedCar)
                 {
                     avoidanceTurn = -1f;
                 }
-                else if (!pAvoidance.RightBlocked)
+                else if (!pAvoidance.RightBlockedCar)
                 {
                     avoidanceTurn = 1f;
                 }
@@ -202,5 +224,43 @@ public class PacifistAgent : MonoBehaviour
     public void SetWaypoint(Vector3 waypoint)
     {
         currentWaypoint = waypoint;
+    }
+
+
+    //This is completely optional, and it is if you want to have a recovery from collisions.
+    private IEnumerator RecoverFromCollision()
+    {
+        recoveringFromCollision = true;
+
+        // Step 1: Stop moving forward
+        carController.Drive(0f, 0f);
+
+        yield return new WaitForSeconds(0.3f);
+
+        // Step 2: Reverse away
+        carController.Drive(0f, -1f);
+
+        yield return new WaitForSeconds(recoveryReverseTime);
+
+        // Step 3: Steer away
+        carController.Drive(1f, 0f);
+
+        yield return new WaitForSeconds(recoveryTurnTime);
+
+        // Step 4: Return control to agent
+        carController.Drive(0f, 0f);
+
+        recoveringFromCollision = false;
+    }
+    public void OnCollisionEnter(Collision collision)
+    {
+        if (recoveringFromCollision)
+        {
+            return;
+        }
+
+        StartCoroutine(RecoverFromCollision());
+        
+        collisionsCount++;
     }
 }
