@@ -175,7 +175,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38db4cb4be56ba64fb852680c2e3f83b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaypointPath
-  nextIndex: 3
+  nextIndex: 1
+  currentIndex: 0
 --- !u!1 &133534422
 GameObject:
   m_ObjectHideFlags: 0
@@ -783,7 +784,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
   acceleration: 40
-  testSteer: 1
+  testSteer: 0
   testThrottle: 1
   turnDegrees: 90
   grip: 5
