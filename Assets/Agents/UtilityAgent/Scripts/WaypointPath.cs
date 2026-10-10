@@ -20,7 +20,7 @@ public class WaypointPath : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log(NextWaypoint);
+        //Debug.Log(NextWaypoint);
         foreach (Transform child in transform)
         {
             waypoints.Add(child.transform);
