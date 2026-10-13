@@ -723,7 +723,7 @@ Transform:
   m_GameObject: {fileID: 151613328}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.6, y: 0.58, z: -1.5}
+  m_LocalPosition: {x: -25.45663, y: 0.58, z: 85.84723}
   m_LocalScale: {x: 4, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2066,7 +2066,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 188.2}
-  m_LocalScale: {x: 7, y: 1, z: 50}
+  m_LocalScale: {x: 10, y: 1, z: 50}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1438456166}
@@ -2177,7 +2177,7 @@ Transform:
   m_GameObject: {fileID: 898189523}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 36.25663, y: 0.58, z: -14.5}
+  m_LocalPosition: {x: 17.4, y: 0.58, z: 72.84723}
   m_LocalScale: {x: 4, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2379,7 +2379,7 @@ Transform:
   m_GameObject: {fileID: 913926352}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 20.4, y: 0.58, z: -30.2}
+  m_LocalPosition: {x: 1.5433693, y: 0.58, z: 57.14723}
   m_LocalScale: {x: 4, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2802,7 +2802,7 @@ Transform:
   m_GameObject: {fileID: 1115409726}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 36.25663, y: 0.58, z: 15.85277}
+  m_LocalPosition: {x: 17.4, y: 0.58, z: 103.2}
   m_LocalScale: {x: 4, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3032,7 +3032,7 @@ GameObject:
   - component: {fileID: 1353015516}
   - component: {fileID: 1353015515}
   - component: {fileID: 1353015514}
-  - component: {fileID: 1353015521}
+  - component: {fileID: 1353015524}
   - component: {fileID: 1353015520}
   - component: {fileID: 1353015523}
   m_Layer: 0
@@ -3201,25 +3201,6 @@ MonoBehaviour:
   - {fileID: 306807271}
   inRangeDrivers: []
   lockedTarget: {fileID: 0}
---- !u!114 &1353015521
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1353015511}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e07dfb6dcbfe954780da8862a1d6a8b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PacifistObstacleAvoidance
-  sensorOrigin: {fileID: 1699533559}
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 64
-  driverMask:
-    serializedVersion: 2
-    m_Bits: 128
 --- !u!65 &1353015523
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3241,6 +3222,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 20, y: 1, z: 5}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1353015524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353015511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb9fd1a439336d946be95f92728025e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BasicObstacleAvoidance
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 64
+  driverMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &1363503944
 GameObject:
   m_ObjectHideFlags: 0

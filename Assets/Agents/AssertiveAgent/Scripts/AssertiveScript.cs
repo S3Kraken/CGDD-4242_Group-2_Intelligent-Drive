@@ -22,6 +22,14 @@ public class AssertiveScript : MonoBehaviour
     public float recoveryTurnTime = 0.75f;
     #endregion
 
+    #region Avoidance variables
+    private BasicObstacleAvoidance avoidanceScript;
+    private float avoidanceTimer = 0f;
+    private float avoidanceDuration = 0.5f;
+    private float avoidanceTurn = 0f;
+    private float yieldTimer = 0f;
+    #endregion
+
 
     [SerializeField] List<GameObject> Targets = new List<GameObject>();
     [SerializeField] List<GameObject> inRangeDrivers = new List<GameObject>();
@@ -35,6 +43,8 @@ public class AssertiveScript : MonoBehaviour
         waypointPath = FindAnyObjectByType<WaypointPath>();
         currentWaypointIndex = waypointPath.CurrentIndex;
         nextWaypointIndex = waypointPath.NextIndex;
+
+        avoidanceScript = GetComponent<BasicObstacleAvoidance>();
     }
 
     // Update is called once per frame
@@ -100,12 +110,62 @@ public class AssertiveScript : MonoBehaviour
             {
                 turnAmount = -1f;
             }
+
+            //Basic Avoidance
+            #region Avoidance
+
+            if (avoidanceScript != null && avoidanceScript.ObstacleAhead)
+            {
+                avoidanceTimer = avoidanceDuration;
+
+                if (!avoidanceScript.LeftBlocked)
+                {
+                    avoidanceTurn = -1f;
+                }
+                else if (!avoidanceScript.RightBlocked)
+                {
+                    avoidanceTurn = 1f;
+                }
+                else
+                {
+                    avoidanceTurn = 0f;
+                }
+            }
+            else
+            {
+                avoidanceTimer -= Time.deltaTime;
+            }
+
+            if (avoidanceTimer > 0f)
+            {
+                if (avoidanceTurn != 0f)
+                {
+                    turnAmount = avoidanceTurn;
+                }
+                else
+                {
+                    forwardAmount = -1f;
+                }
+            }
+            if (yieldTimer > 0f)
+            {
+                if (avoidanceTurn != 0f)
+                {
+                    turnAmount = avoidanceTurn;
+                }
+                else
+                {
+                    forwardAmount = -1f;
+                }
+            }
+
+            #endregion
         }
         else
         {
             waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
-            forwardAmount = 0f;
-            turnAmount = 0f;
+            //forwardAmount = 0f;
+            //turnAmount = 0f;
         }
     }
 
