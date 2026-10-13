@@ -58,11 +58,11 @@ public class PacifistObstacleAvoidance : MonoBehaviour
 
         Vector3 right = Quaternion.AngleAxis(sideAngle, transform.up) * forward;
 
-        ObstacleAhead = Physics.SphereCast(origin, sensorRadius, forward, out _, forwardDistance, obstacleMask, QueryTriggerInteraction.Ignore);
+        ObstacleAhead = Physics.SphereCast(origin, sensorRadius, forward, out _, forwardDistance, ~0, QueryTriggerInteraction.Ignore);
 
-        LeftBlocked = Physics.SphereCast(origin, sensorRadius, left, out _, sideDistance, obstacleMask, QueryTriggerInteraction.Ignore);
+        LeftBlocked = Physics.SphereCast(origin, sensorRadius, left, out _, sideDistance, ~0, QueryTriggerInteraction.Ignore);
 
-        RightBlocked = Physics.SphereCast( origin, sensorRadius, right, out _, sideDistance, obstacleMask, QueryTriggerInteraction.Ignore);
+        RightBlocked = Physics.SphereCast( origin, sensorRadius, right, out _, sideDistance, ~0, QueryTriggerInteraction.Ignore);
 
         AvoidanceDirection = Vector3.zero;
 
@@ -105,7 +105,8 @@ public class PacifistObstacleAvoidance : MonoBehaviour
 
         Debug.DrawRay(origin, right * sideDistance, RightBlockedCar ? Color.yellow : Color.green);
 
-        if (Physics.SphereCast(origin, sensorRadius, forward, out RaycastHit hit, vehicleDetectionDistance, driverMask, QueryTriggerInteraction.Ignore))
+        if (Physics.SphereCast(origin, sensorRadius, forward, out RaycastHit hit, vehicleDetectionDistance, driverMask, QueryTriggerInteraction.Ignore) ||
+            LeftBlockedCar || RightBlockedCar)
         {
             CarAhead = true;
             DistanceToCar = hit.distance;

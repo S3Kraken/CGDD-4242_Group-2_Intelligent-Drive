@@ -137,10 +137,11 @@ public class PacifistAgent : MonoBehaviour
             if (pAvoidance != null && pAvoidance.CarAhead)
             {
                 yieldTimer = yieldDuration;
-
+                forwardAmount = 0.5f;
                 if (!pAvoidance.LeftBlockedCar)
                 {
                     avoidanceTurn = -1f;
+
                 }
                 else if (!pAvoidance.RightBlockedCar)
                 {
@@ -152,7 +153,16 @@ public class PacifistAgent : MonoBehaviour
                 }
                 if (carIsClose)
                 {
-                    forwardAmount = -1;
+                    if (forwardAmount > 0)
+                    {
+                        forwardAmount = -0.5f;
+
+                    }
+                    else
+                    {
+                        forwardAmount = 0f;
+
+                    }
                 }
             }
             else
@@ -168,7 +178,7 @@ public class PacifistAgent : MonoBehaviour
                 }
                 else
                 {
-                    forwardAmount = -1f;
+                    forwardAmount = -0.5f;
                 }
             }
             if (pAvoidance != null && pAvoidance.CarBehind)
@@ -189,7 +199,16 @@ public class PacifistAgent : MonoBehaviour
                 }
                 if (carIsClose)
                 {
-                    forwardAmount = -1;
+                    if (forwardAmount <= 0)
+                    {
+                        forwardAmount = 0.5f;
+
+                    }
+                    else
+                    {
+                        forwardAmount = 0f;
+
+                    }
                 }
             }
             else
@@ -205,7 +224,7 @@ public class PacifistAgent : MonoBehaviour
                 }
                 else
                 {
-                    forwardAmount = -1f;
+                    forwardAmount = -0.5f;
                 }
             }
 
