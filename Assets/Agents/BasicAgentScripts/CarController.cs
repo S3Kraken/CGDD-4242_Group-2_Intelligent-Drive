@@ -4,21 +4,23 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
-    [SerializeField] private float acceleration = 20f;
+    [field: SerializeField]
+    public float acceleration { get; private set; } = 20f;
     Rigidbody rb;
     private float steerInput;
     private float throttleInput;
 
-    [SerializeField] private float testSteer;
-    [SerializeField] private float testThrottle;
-    [SerializeField] private float turnDegrees = 90f;
+    [field: SerializeField]
+    public float turnDegrees { get; private set; } = 90f;
     [Tooltip("Higher values make the car slide less, but move slower.")]
-    [SerializeField] private float grip = 5f;
+
+    [field: SerializeField]
+    public float grip { get; private set; } = 5f;
 
     private void FixedUpdate()
     {
         rb.AddForce(transform.forward * (acceleration * throttleInput), ForceMode.Acceleration);
-        rb.MoveRotation(rb.rotation * Quaternion.Euler(0,steerInput * turnDegrees * Time.fixedDeltaTime, 0));
+        rb.MoveRotation(rb.rotation * Quaternion.Euler(0, steerInput * turnDegrees * Time.fixedDeltaTime, 0));
         float sidewaysSpeed = Vector3.Dot(rb.linearVelocity, transform.right);
         rb.AddForce(transform.right * -(sidewaysSpeed * grip), ForceMode.Acceleration);
     }
@@ -39,17 +41,17 @@ public class CarController : MonoBehaviour
         //Drive(testSteer, testThrottle);
     }
 
-    public void SetGrip(int num)
+    public void SetGrip(float num)
     {
         grip = num;
     }
 
-    public void SetAcceleration(int num)
+    public void SetAcceleration(float num)
     {
         acceleration = num;
     }
 
-    public void SetTurnDegrees(int degrees)
+    public void SetTurnDegrees(float degrees)
     {
         turnDegrees = degrees;
     }

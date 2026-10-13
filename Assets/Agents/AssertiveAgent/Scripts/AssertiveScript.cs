@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 
@@ -30,6 +31,10 @@ public class AssertiveScript : MonoBehaviour
     private float yieldTimer = 0f;
     #endregion
 
+    float setAccel;
+    float setGrip;
+    float setTurnDegrees;
+
 
     [SerializeField] List<GameObject> Targets = new List<GameObject>();
     [SerializeField] List<GameObject> inRangeDrivers = new List<GameObject>();
@@ -45,6 +50,10 @@ public class AssertiveScript : MonoBehaviour
         nextWaypointIndex = waypointPath.NextIndex;
 
         avoidanceScript = GetComponent<BasicObstacleAvoidance>();
+
+        setAccel = carController.acceleration;
+        setGrip = carController.grip;
+        setTurnDegrees = carController.turnDegrees;
     }
 
     // Update is called once per frame
@@ -102,13 +111,11 @@ public class AssertiveScript : MonoBehaviour
             }
 
             float angleToDir = Vector3.SignedAngle(transform.forward, dirToMovePosition, Vector3.up);
-            if (angleToDir > 0)
+            turnAmount = Mathf.Clamp(angleToDir / 45f, -1f, 1f);
+
+            if (Mathf.Abs(angleToDir) < 2f)
             {
-                turnAmount = 1f;
-            }
-            else
-            {
-                turnAmount = -1f;
+                turnAmount = 0f;
             }
 
             //Basic Avoidance
@@ -273,9 +280,9 @@ public class AssertiveScript : MonoBehaviour
                 lockedTarget = null;
                 targetLocked = false;
 
-                carController.SetGrip(5);
-                carController.SetAcceleration(40);
-                carController.SetTurnDegrees(90);
+                carController.SetGrip(setGrip);
+                carController.SetAcceleration(setAccel);
+                carController.SetTurnDegrees(setTurnDegrees);
             }
         }
     }

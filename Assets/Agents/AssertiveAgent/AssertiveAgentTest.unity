@@ -167,11 +167,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  testSteer: 0
-  testThrottle: 0
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 20
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &2336534
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -723,7 +721,7 @@ Transform:
   m_GameObject: {fileID: 151613328}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -25.45663, y: 0.58, z: 85.84723}
+  m_LocalPosition: {x: -7.2, y: 0.58, z: 85.84723}
   m_LocalScale: {x: 4, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -777,11 +775,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  testSteer: 0
-  testThrottle: 0
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 20
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &168851344
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -920,11 +916,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  testSteer: 0
-  testThrottle: 0
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 20
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &216184306
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -998,7 +992,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 8c023b59499b96d458bc68f879d8fce4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1093,11 +1087,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  testSteer: 0
-  testThrottle: 0
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 20
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &219643444
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1271,11 +1263,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 45
-  testSteer: 0
-  testThrottle: 0
-  turnDegrees: 120
-  grip: 5
+  <acceleration>k__BackingField: 45
+  <turnDegrees>k__BackingField: 120
+  <grip>k__BackingField: 5
 --- !u!54 &306807275
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1390,7 +1380,7 @@ Transform:
   m_GameObject: {fileID: 306807271}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.6, y: 0.5, z: -51.51}
+  m_LocalPosition: {x: 5.9, y: 0.5, z: -58.41}
   m_LocalScale: {x: 2, y: 1, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1723,7 +1713,7 @@ Transform:
   m_GameObject: {fileID: 805731354}
   serializedVersion: 2
   m_LocalRotation: {x: 0.10886683, y: -0, z: -0, w: 0.9940564}
-  m_LocalPosition: {x: 0, y: 4.1, z: -42.27}
+  m_LocalPosition: {x: 0, y: 4.1, z: -49.170002}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1848,11 +1838,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  testSteer: 0
-  testThrottle: 0
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 20
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &818245490
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2802,7 +2790,7 @@ Transform:
   m_GameObject: {fileID: 1115409726}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 17.4, y: 0.58, z: 103.2}
+  m_LocalPosition: {x: 0.5, y: 0.58, z: 103.2}
   m_LocalScale: {x: 4, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3054,11 +3042,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  testSteer: 0
-  testThrottle: 0
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 40
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &1353015515
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3173,7 +3159,7 @@ Transform:
   m_GameObject: {fileID: 1353015511}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: -34.8}
+  m_LocalPosition: {x: 0, y: 0.5, z: -41.7}
   m_LocalScale: {x: 2, y: 1, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3606,11 +3592,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  testSteer: 0
-  testThrottle: 0
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 20
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!1 &1470299538
 GameObject:
   m_ObjectHideFlags: 0
@@ -3919,11 +3903,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 30
-  testSteer: 0
-  testThrottle: 0
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 30
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &1629170005
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4038,7 +4020,7 @@ Transform:
   m_GameObject: {fileID: 1629170001}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.3, y: 0.5, z: 15}
+  m_LocalPosition: {x: 1.3, y: 0.5, z: 24.1}
   m_LocalScale: {x: 2, y: 1, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children:
