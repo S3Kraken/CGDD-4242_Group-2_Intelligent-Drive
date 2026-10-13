@@ -259,6 +259,9 @@ public class PacifistAgent : MonoBehaviour
             return;
         }
 
+        if (collision.gameObject.name == "Ground" || collision.gameObject.name == "Road")
+            return;
+
         StartCoroutine(RecoverFromCollision());
         
         collisionsCount++;

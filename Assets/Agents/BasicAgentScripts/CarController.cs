@@ -12,6 +12,7 @@ public class CarController : MonoBehaviour
     [SerializeField] private float testSteer;
     [SerializeField] private float testThrottle;
     [SerializeField] private float turnDegrees = 90f;
+    [Tooltip("Higher values make the car slide less, but move slower.")]
     [SerializeField] private float grip = 5f;
 
     private void FixedUpdate()
@@ -36,5 +37,20 @@ public class CarController : MonoBehaviour
     private void Update()
     {
         //Drive(testSteer, testThrottle);
+    }
+
+    public void SetGrip(int num)
+    {
+        grip = num;
+    }
+
+    public void SetAcceleration(int num)
+    {
+        acceleration = num;
+    }
+
+    public void SetTurnDegrees(int degrees)
+    {
+        turnDegrees = degrees;
     }
 }
