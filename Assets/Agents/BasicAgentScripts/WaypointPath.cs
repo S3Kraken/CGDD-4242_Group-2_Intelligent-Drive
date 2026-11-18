@@ -16,6 +16,7 @@ public class WaypointPath : MonoBehaviour
 
     public int CurrentIndex { get { return currentIndex; }}
     public int NextIndex { get { return nextIndex; } }
+    public int LastWaypoint { get {  return waypoints.Count - 1; } }
 
 
     private void Start()
@@ -32,7 +33,7 @@ public class WaypointPath : MonoBehaviour
     }
     public Transform GetCurrentWaypoint(int currentIndex)
     {
-            return waypoints[currentIndex];
+        return waypoints[currentIndex];
     }
     public void WaypointReached(ref int currentIndex, ref int nextIndex)
     {
