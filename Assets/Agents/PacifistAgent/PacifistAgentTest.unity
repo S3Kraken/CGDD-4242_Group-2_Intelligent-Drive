@@ -779,9 +779,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 40
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &765066631
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -935,9 +935,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 40
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &795552264
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1791,9 +1791,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 40
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &1353015515
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1979,9 +1979,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 40
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!54 &1386870997
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2256,9 +2256,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f254fcb77bf39a4a9f4f8dbcf661af0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
-  acceleration: 40
-  turnDegrees: 90
-  grip: 5
+  <acceleration>k__BackingField: 40
+  <turnDegrees>k__BackingField: 90
+  <grip>k__BackingField: 5
 --- !u!114 &1439775945
 MonoBehaviour:
   m_ObjectHideFlags: 0
