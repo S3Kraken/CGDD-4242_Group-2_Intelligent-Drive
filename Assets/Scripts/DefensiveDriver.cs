@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class DefensiveDriver : MonoBehaviour
+public class DefensiveDriver : MonoBehaviour, RacingDrivers
 {
 
     public Transform[] waypoints;
@@ -27,7 +27,32 @@ public class DefensiveDriver : MonoBehaviour
     private float avoidance = 0f;
     private float holdTimer = 0f;
     private bool bothSidesBlocked = false;
+    private int lapNumber = 1;
+    public int CurrentWaypoint => currentWaypoint;
 
+    public int LapNumber => lapNumber;
+
+    public float DistanceToWaypoint =>
+        waypoints != null && waypoints.Length > 0
+        ? Vector3.Distance(transform.position, waypoints[currentWaypoint].position)
+        : 0f;
+
+    public Transform DriverTransform => transform;
+
+    public float RaceProgress
+    {
+        get
+        {
+            return waypoints != null && waypoints.Length > 0
+                ? (float)currentWaypoint / waypoints.Length
+                : 0f;
+        }
+    }
+
+    public void ReceiveHotspotInformation()
+    {
+        // Store or process collision hotspot information here.
+    }
     void Start()
     {
         currentSpeed = speed;
@@ -136,7 +161,14 @@ public class DefensiveDriver : MonoBehaviour
     {
         if (Vector3.Distance(transform.position, waypoints[currentWaypoint].position) < waypointRadius)
         {
-            currentWaypoint = (currentWaypoint + 1) % waypoints.Length;
+            currentWaypoint++;
+
+            // If the driver completes all waypoints, start another lap.
+            if (currentWaypoint >= waypoints.Length)
+            {
+                currentWaypoint = 0;
+                lapNumber++;
+            }
         }
     }
 }
