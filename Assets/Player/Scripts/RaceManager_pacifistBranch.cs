@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RaceManager : MonoBehaviour
+public class RaceManager_pacifistBranch : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     [SerializeField] private int raceLaps = 3;

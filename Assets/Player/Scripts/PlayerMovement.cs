@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     private PlayerInput player;
     private InputAction movement;
     private InputActionAsset inputActions;
-    private RaceManager raceManager;
+    private RaceManager_pacifistBranch raceManager;
 
     private Vector3 currentWaypoint;
     private int currentWaypointIndex;
@@ -42,7 +42,7 @@ public class PlayerMovement : MonoBehaviour
         nextWaypointIndex = waypointPath.NextIndex;
         player = GetComponent<PlayerInput>();
         movement = player.actions["Move"];
-        raceManager = FindAnyObjectByType<RaceManager>();
+        raceManager = FindAnyObjectByType<RaceManager_pacifistBranch>();
 
         lapsLeft = raceManager.RaceLaps;
     }
@@ -89,13 +89,11 @@ public class PlayerMovement : MonoBehaviour
                     }
                 }
                 float angleToDir = Vector3.SignedAngle(transform.forward, dirToMovePosition, Vector3.up);
-                if (angleToDir > 0)
+                turnAmount = Mathf.Clamp(angleToDir / 45f, -1f, 1f);
+
+                if (Mathf.Abs(angleToDir) < 2f)
                 {
-                    turnAmount = 1f;
-                }
-                else
-                {
-                    turnAmount = -1f;
+                    turnAmount = 0f;
                 }
             }
             carController.Drive(turnAmount, forwardAmount);
