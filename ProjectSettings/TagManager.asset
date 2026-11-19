@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PacifistDriver
   - Driver
+  - Opponent
   layers:
   - Default
   - TransparentFX
