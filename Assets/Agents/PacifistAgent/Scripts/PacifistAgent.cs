@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class PacifistAgent : MonoBehaviour
+public class PacifistAgent : MonoBehaviour, RacingDrivers
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     //private Transform targetWaypointTransform;
@@ -31,6 +31,30 @@ public class PacifistAgent : MonoBehaviour
     public float recoveryReverseTime = 1.0f;
     public float recoveryTurnTime = 0.75f;
     #endregion
+
+    private int lapNumber = 1;
+
+    public int CurrentWaypoint => currentWaypointIndex;
+
+    public int LapNumber => lapNumber;
+
+    public float DistanceToWaypoint =>
+        Vector3.Distance(transform.position, currentWaypoint);
+
+    public Transform DriverTransform => transform;
+
+    public float RaceProgress
+    {
+        get
+        {
+            if (waypointPath == null || waypointPath.WaypointCount == 0)
+                return 0f;
+
+            return (float)currentWaypointIndex /
+                   waypointPath.WaypointCount;
+        }
+    }
+
 
     void Start()
     {
@@ -230,10 +254,21 @@ public class PacifistAgent : MonoBehaviour
         }
         else
         {
-            waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
-            //forwardAmount = 0f;
-            //turnAmount = 0f;
+            int previousWaypoint = currentWaypointIndex;
+
+            waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex
+            );
+
+            // Check if the driver completed a lap.
+            if (currentWaypointIndex < previousWaypoint)
+            {
+                lapNumber++;
+
+                Debug.Log(gameObject.name +
+                          " completed lap " + lapNumber);
+            }
         }
+    
 
             carController.Drive(turnAmount, forwardAmount);
     }
@@ -282,5 +317,11 @@ public class PacifistAgent : MonoBehaviour
         StartCoroutine(RecoverFromCollision());
         
         collisionsCount++;
+    }
+
+    public void ReceiveHotspotInformation()
+    {
+        Debug.Log(gameObject.name +
+                  " received hotspot information.");
     }
 }

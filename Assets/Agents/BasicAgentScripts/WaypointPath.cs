@@ -18,6 +18,8 @@ public class WaypointPath : MonoBehaviour
     public int NextIndex { get { return nextIndex; } }
     public int LastWaypoint { get {  return waypoints.Count - 1; } }
 
+    public int WaypointCount => waypoints.Count;
+
 
     private void Start()
     {

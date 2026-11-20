@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using static UnityEngine.GraphicsBuffer;
 
-public class AggressiveBehaviour : MonoBehaviour
+public class AggressiveBehaviour : MonoBehaviour, RacingDrivers
 {
     private CarController carController;
     private WaypointPath waypointPath;
@@ -34,7 +34,28 @@ public class AggressiveBehaviour : MonoBehaviour
     public float timeSinceLastWaypoint = 0.0f;
     public float timeSinceLastCollision = 0.0f;
     private int waypointsCrossed = 0;
+    private int lapNumber = 1;
 
+    public int CurrentWaypoint => currentWaypointIndex;
+
+    public int LapNumber => lapNumber;
+
+    public float DistanceToWaypoint =>
+        Vector3.Distance(transform.position, currentWaypoint);
+
+    public Transform DriverTransform => transform;
+
+    public float RaceProgress
+    {
+        get
+        {
+            if (waypointPath == null || waypointPath.WaypointCount == 0)
+                return 0f;
+
+            return (float)currentWaypointIndex /
+                   waypointPath.WaypointCount;
+        }
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -271,6 +292,11 @@ public class AggressiveBehaviour : MonoBehaviour
                 carController.SetTurnDegrees(90);
             }
         }
+    }
+    public void ReceiveHotspotInformation()
+    {
+        Debug.Log(gameObject.name +
+                  " received hotspot information.");
     }
 }
 

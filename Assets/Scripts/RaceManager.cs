@@ -33,7 +33,7 @@ public class RaceManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning(driverObject.name + " does not implement IRaceDriver.");
+                Debug.LogWarning(driverObject.name + " does not implement RaceDriver.");
             }
         }
     }
@@ -78,7 +78,6 @@ public class RaceManager : MonoBehaviour
         }
     }
 
-    // Sends collision hotspot information to all registered drivers.
     public void ShareHotspotInformation()
     {
         foreach (RacingDrivers driver in drivers)
