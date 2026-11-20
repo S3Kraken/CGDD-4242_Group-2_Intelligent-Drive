@@ -9,5 +9,6 @@ public interface RacingDrivers
 
         Transform DriverTransform { get; }
     void ReceiveHotspotInformation();
+    void ResetDriver();
 
 }

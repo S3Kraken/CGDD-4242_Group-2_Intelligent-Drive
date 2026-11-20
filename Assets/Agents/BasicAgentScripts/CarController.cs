@@ -72,4 +72,8 @@ public class CarController : MonoBehaviour
     {
         turnDegrees = degrees;
     }
+    public void OnTriggerEnter(Collider other)
+    {
+        
+    }
 }

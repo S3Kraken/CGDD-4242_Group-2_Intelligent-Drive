@@ -2,26 +2,61 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour, RacingDrivers
 {
     private CarController carController;
     private WaypointPath waypointPath;
     private PlayerInput player;
     private InputAction movement;
-    private InputActionAsset inputActions;
     private RaceManager raceManager;
+    private Collider driverCollider;
 
     private Vector3 currentWaypoint;
+    private int lastWaypointIndex;
     private int currentWaypointIndex;
     private int nextWaypointIndex;
 
     private float steerDirection;
     private float throttleDirection;
 
-    private int lapsLeft;
+    private int lapNumber;
     private bool finalLap = false;
-    private bool racedFinished = false;
+    private bool raceFinished = false;
 
+    //test for lerp
+    private bool isResetting = false;
+
+    #region Interface Variables
+    public Transform DriverTransform => transform;
+    public int CurrentWaypoint => currentWaypointIndex;
+
+    public int LapNumber => lapNumber;
+
+    public float DistanceToWaypoint =>
+        waypointPath != null && waypointPath.LastWaypoint+1 > 0
+        ? Vector3.Distance(transform.position, waypointPath.GetCurrentWaypoint(currentWaypointIndex).position)
+        : 0f;
+    public float RaceProgress
+    {
+        get
+        {
+            return waypointPath != null && waypointPath.LastWaypoint+1 > 0
+                ? (float)currentWaypointIndex / waypointPath.LastWaypoint+1
+                : 0f;
+        }
+    }
+    public void ReceiveHotspotInformation()
+    {
+        // Store or process collision hotspot information here.
+    }
+    public void ResetDriver()
+    {
+        //driverCollider.enabled = false;
+        //transform.position = Vector3.Slerp(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position, 5f*Time.deltaTime);
+        isResetting = true;
+        //driverCollider.enabled = true;
+    }
+    #endregion
     #region collision recovery variables
     private int collisionsCount = 0;
     private bool recoveringFromCollision = false;
@@ -40,21 +75,34 @@ public class PlayerMovement : MonoBehaviour
         waypointPath = FindAnyObjectByType<WaypointPath>();
         currentWaypointIndex = waypointPath.CurrentIndex;
         nextWaypointIndex = waypointPath.NextIndex;
+        lastWaypointIndex = currentWaypointIndex;
         player = GetComponent<PlayerInput>();
         movement = player.actions["Move"];
         raceManager = FindAnyObjectByType<RaceManager>();
+        driverCollider = GetComponent<Collider>();
 
-        lapsLeft = raceManager.RaceLaps;
+        lapNumber = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
         Vector2 inputVector = movement.ReadValue<Vector2>();
-        
+
         //This if statements dictates if the player or the ai is driving.
         //it is supposed to be like when you finish a race in MK and the character continues to drive
-        if (!racedFinished)
+        if (isResetting)
+        {
+            driverCollider.enabled = false;
+            transform.position = Vector3.Lerp(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position, 1.5f * Time.deltaTime);
+            
+            if (Vector3.Distance(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position) < 5f)
+            {
+                isResetting = false;
+                driverCollider.enabled = true;
+            }
+        }
+        else if (!raceFinished)
         {
             steerDirection = inputVector.x;
             throttleDirection = inputVector.y;
@@ -114,8 +162,8 @@ public class PlayerMovement : MonoBehaviour
             
             if (!finalLap && currentWaypointIndex == waypointPath.LastWaypoint)
             {
-                lapsLeft--;
-                if(lapsLeft == 0)
+                lapNumber++;
+                if(lapNumber == raceManager.RaceLaps)
                 {
                     finalLap = true;
                 }
@@ -124,9 +172,9 @@ public class PlayerMovement : MonoBehaviour
             if (finalLap && currentWaypointIndex == waypointPath.LastWaypoint)
             {
                 //win or loss state
-                racedFinished = true;
+                raceFinished = true;
             }
-
+            lastWaypointIndex = currentWaypointIndex;
             waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
             
         }
@@ -169,11 +217,12 @@ public class PlayerMovement : MonoBehaviour
         {
             return;
         }
-        if (racedFinished)
+        if (raceFinished)
         {
             StartCoroutine(RecoverFromCollision());
         }
 
         collisionsCount++;
     }
+   
 }

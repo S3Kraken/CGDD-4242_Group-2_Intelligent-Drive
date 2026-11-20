@@ -1,17 +1,56 @@
 using System.Collections;
 using UnityEngine;
 
-public class PacifistAgent : MonoBehaviour
+public class PacifistAgent : MonoBehaviour, RacingDrivers
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     //private Transform targetWaypointTransform;
     
     private CarController carController;
     private WaypointPath waypointPath;
+    private RaceManager raceManager;
+    private Collider driverCollider;
 
     private Vector3 currentWaypoint;
+    private int lastWaypointIndex;
     private int currentWaypointIndex;
     private int nextWaypointIndex;
+
+    private int lapNumber;
+    private bool finalLap;
+    private bool raceFinished;
+
+
+    #region Interface Variables
+    public Transform DriverTransform => transform;
+    public int CurrentWaypoint => currentWaypointIndex;
+
+    public int LapNumber => lapNumber;
+
+    public float DistanceToWaypoint =>
+        waypointPath != null && waypointPath.LastWaypoint + 1 > 0
+        ? Vector3.Distance(transform.position, waypointPath.GetCurrentWaypoint(currentWaypointIndex).position)
+        : 0f;
+    public float RaceProgress
+    {
+        get
+        {
+            return waypointPath != null && waypointPath.LastWaypoint + 1 > 0
+                ? (float)currentWaypointIndex / waypointPath.LastWaypoint + 1
+                : 0f;
+        }
+    }
+    public void ReceiveHotspotInformation()
+    {
+        // Store or process collision hotspot information here.
+    }
+    public void ResetDriver()
+    {
+        driverCollider.enabled = false;
+        transform.position = waypointPath.GetCurrentWaypoint(lastWaypointIndex).position;
+        driverCollider.enabled = true;
+    }
+    #endregion
 
     //this is only for the pacifist agent
     #region Pacifist variables
@@ -38,6 +77,8 @@ public class PacifistAgent : MonoBehaviour
         waypointPath = FindAnyObjectByType<WaypointPath>();
         currentWaypointIndex = waypointPath.CurrentIndex;
         nextWaypointIndex = waypointPath.NextIndex;
+        driverCollider = GetComponent<Collider>();
+        raceManager = FindFirstObjectByType<RaceManager>();
 
         pAvoidance = GetComponent<PacifistObstacleAvoidance>();
     }
@@ -230,6 +271,21 @@ public class PacifistAgent : MonoBehaviour
         }
         else
         {
+            if (!finalLap && currentWaypointIndex == waypointPath.LastWaypoint)
+            {
+                lapNumber++;
+                if (lapNumber >= raceManager.RaceLaps)
+                {
+                    finalLap = true;
+                }
+            }
+
+            if (finalLap && currentWaypointIndex == waypointPath.LastWaypoint)
+            {
+                //win or loss state
+                raceFinished = true;
+            }
+            lastWaypointIndex = currentWaypointIndex;
             waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
             //forwardAmount = 0f;
             //turnAmount = 0f;

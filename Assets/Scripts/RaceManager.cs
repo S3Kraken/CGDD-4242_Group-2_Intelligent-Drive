@@ -90,4 +90,11 @@ public class RaceManager : MonoBehaviour
             driver.ReceiveHotspotInformation();
         }
     }
+    public void ResetDriver(RacingDrivers driver)
+    {
+        if (driver != null)
+        {
+            driver.ResetDriver();
+        }
+    }
 }

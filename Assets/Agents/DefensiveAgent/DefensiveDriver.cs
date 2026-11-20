@@ -21,7 +21,10 @@ public class DefensiveDriver : MonoBehaviour, RacingDrivers
     public float avoidanceSmoothing = 3f;
     public float clearDelay = 0.4f;
 
+    private Collider driverCollider;
+
     private int currentWaypoint = 0;
+    private int lastWaypoint = 0;
     private float currentSpeed;
     private int avoidSide = 0;
     private float avoidance = 0f;
@@ -53,8 +56,16 @@ public class DefensiveDriver : MonoBehaviour, RacingDrivers
     {
         // Store or process collision hotspot information here.
     }
+    public void ResetDriver()
+    {
+        //I quickly made this, so feel free to change it to your liking
+        driverCollider.enabled = false;
+        transform.position = waypoints[lastWaypoint].position;
+        driverCollider.enabled = true;
+    }
     void Start()
     {
+        driverCollider = GetComponent<Collider>();
         currentSpeed = speed;
     }
 
@@ -161,6 +172,7 @@ public class DefensiveDriver : MonoBehaviour, RacingDrivers
     {
         if (Vector3.Distance(transform.position, waypoints[currentWaypoint].position) < waypointRadius)
         {
+            lastWaypoint = currentWaypoint;
             currentWaypoint++;
 
             // If the driver completes all waypoints, start another lap.
