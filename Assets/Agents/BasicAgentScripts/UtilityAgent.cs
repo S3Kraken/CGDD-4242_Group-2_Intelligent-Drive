@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class UtilityAgent : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    //Start is called once before the first execution of Update after the MonoBehaviour is created
     //private Transform targetWaypointTransform;
 
     private CarController carController;
@@ -21,18 +21,18 @@ public class UtilityAgent : MonoBehaviour
     private float lapStartTime = -1f;
 
     [Header("Utility tuning")]
-    [SerializeField] private bool usePads = true;           // untick for the waypoint-only baseline run
-    [SerializeField] private float detectionRadius = 40f;   // DETECTION_RADIUS (m)
-    [SerializeField] private float pObs = 5f;               // P_OBS (s)
-    [SerializeField] private float hCommit = 0.5f;          // H_COMMIT (s)
+    [SerializeField] private bool usePads = true;           //untick for the waypoint-only baseline run
+    [SerializeField] private float detectionRadius = 40f;   //DETECTION_RADIUS (m)
+    [SerializeField] private float pObs = 5f;               //P_OBS (s)
+    [SerializeField] private float hCommit = 0.5f;          //H_COMMIT (s)
 
     [Header("Movement tuning")]
     [SerializeField] private float reachedWaypointDistance = 10f;
-    [SerializeField] private float maxSteerAngle = 45f;     // MAX_STEER_ANGLE (degrees)
-    [SerializeField] private float slowdownFactor = 0.5f;   // SLOWDOWN_FACTOR
-    [SerializeField] private float rayAngle = 30f;          // angle of the left/right rays
-    [SerializeField] private float avoidDistance = 10f;     // AVOID_DISTANCE (m)
-    [SerializeField] private float avoidStrength = 0.8f;    // AVOID_STRENGTH
+    [SerializeField] private float maxSteerAngle = 45f;     //MAX_STEER_ANGLE (degrees)
+    [SerializeField] private float slowdownFactor = 0.5f;   //SLOWDOWN_FACTOR
+    [SerializeField] private float rayAngle = 30f;          //angle of the left/right rays
+    [SerializeField] private float avoidDistance = 10f;     //AVOID_DISTANCE (m)
+    [SerializeField] private float avoidStrength = 0.8f;    //AVOID_STRENGTH
     [SerializeField] private float carHalfWidth = 1.2f;
 
     //this is if you want the collision recovery
@@ -204,7 +204,7 @@ public class UtilityAgent : MonoBehaviour
         Vector3 direction = toPad.normalized;
         float distance = toPad.magnitude;
 
-        // Sideways direction, measured across the line to the pad
+        //Sideways direction, measured across the line to the pad
         Vector3 side = Vector3.Cross(Vector3.up, direction);
 
         float[] offsets = { -carHalfWidth, 0f, carHalfWidth };
@@ -229,6 +229,43 @@ public class UtilityAgent : MonoBehaviour
         }
     }
 
+
+    ////This is completely optional, and it is if you want to have a recovery from collisions.
+    //private IEnumerator RecoverFromCollision()
+    //{
+    //    recoveringFromCollision = true;
+
+    //    // Step 1: Stop moving forward
+    //    carController.Drive(0f, 0f);
+
+    //    yield return new WaitForSeconds(0.3f);
+
+    //    // Step 2: Reverse away
+    //    carController.Drive(0f, -1f);
+
+    //    yield return new WaitForSeconds(recoveryReverseTime);
+
+    //    // Step 3: Steer away
+    //    carController.Drive(1f, 0f);
+
+    //    yield return new WaitForSeconds(recoveryTurnTime);
+
+    //    // Step 4: Return control to agent
+    //    carController.Drive(0f, 0f);
+
+    //    recoveringFromCollision = false;
+    //}
+    //public void OnCollisionEnter(Collision collision)
+    //{
+    //    if (recoveringFromCollision)
+    //    {
+    //        return;
+    //    }
+
+    //    StartCoroutine(RecoverFromCollision());
+
+    //    collisionsCount++;
+    //}
 
     //This is completely optional, and it is if you want to have a recovery from collisions.
     private IEnumerator RecoverFromCollision()
@@ -261,6 +298,9 @@ public class UtilityAgent : MonoBehaviour
         {
             return;
         }
+
+        if (collision.gameObject.name == "Ground" || collision.gameObject.name == "Road")
+            return;
 
         StartCoroutine(RecoverFromCollision());
 
