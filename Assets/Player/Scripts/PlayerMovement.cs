@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     private PlayerInput player;
     private InputAction movement;
     private InputActionAsset inputActions;
-    private RaceManager_pacifistBranch raceManager;
+    private RaceManager raceManager;
 
     private Vector3 currentWaypoint;
     private int currentWaypointIndex;
@@ -42,7 +42,7 @@ public class PlayerMovement : MonoBehaviour
         nextWaypointIndex = waypointPath.NextIndex;
         player = GetComponent<PlayerInput>();
         movement = player.actions["Move"];
-        raceManager = FindAnyObjectByType<RaceManager_pacifistBranch>();
+        raceManager = FindAnyObjectByType<RaceManager>();
 
         lapsLeft = raceManager.RaceLaps;
     }
@@ -51,7 +51,9 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         Vector2 inputVector = movement.ReadValue<Vector2>();
-
+        
+        //This if statements dictates if the player or the ai is driving.
+        //it is supposed to be like when you finish a race in MK and the character continues to drive
         if (!racedFinished)
         {
             steerDirection = inputVector.x;

@@ -14,6 +14,10 @@ public class RaceManager : MonoBehaviour
     private Dictionary<RacingDrivers, float> driverProgress =
         new Dictionary<RacingDrivers, float>();
 
+    [SerializeField] private int raceLaps = 3;
+
+    public int RaceLaps { get { return raceLaps; } }
+
     void Start()
     {
         InitializeDrivers();
