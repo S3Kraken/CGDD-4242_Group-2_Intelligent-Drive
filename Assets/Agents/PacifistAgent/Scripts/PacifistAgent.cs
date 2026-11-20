@@ -10,6 +10,7 @@ public class PacifistAgent : MonoBehaviour, RacingDrivers
     private WaypointPath waypointPath;
     private RaceManager raceManager;
     private Collider driverCollider;
+    private Rigidbody rb;
 
     private Vector3 currentWaypoint;
     private int lastWaypointIndex;
@@ -19,6 +20,8 @@ public class PacifistAgent : MonoBehaviour, RacingDrivers
     private int lapNumber;
     private bool finalLap;
     private bool raceFinished;
+
+    private bool isResetting = false;
 
 
     #region Interface Variables
@@ -46,9 +49,10 @@ public class PacifistAgent : MonoBehaviour, RacingDrivers
     }
     public void ResetDriver()
     {
-        driverCollider.enabled = false;
-        transform.position = waypointPath.GetCurrentWaypoint(lastWaypointIndex).position;
-        driverCollider.enabled = true;
+        isResetting = true;
+        //driverCollider.enabled = false;
+        //transform.position = waypointPath.GetCurrentWaypoint(lastWaypointIndex).position;
+        //driverCollider.enabled = true;
     }
     #endregion
 
@@ -79,6 +83,7 @@ public class PacifistAgent : MonoBehaviour, RacingDrivers
         nextWaypointIndex = waypointPath.NextIndex;
         driverCollider = GetComponent<Collider>();
         raceManager = FindFirstObjectByType<RaceManager>();
+        rb = GetComponent<Rigidbody>();
 
         pAvoidance = GetComponent<PacifistObstacleAvoidance>();
     }
@@ -97,201 +102,220 @@ public class PacifistAgent : MonoBehaviour, RacingDrivers
         {
             SetWaypoint(waypointPath.GetCurrentWaypoint(currentWaypointIndex).position);
         }
-        float forwardAmount = 0f;
-        float turnAmount = 0f;
-
-        float reachedWaypointDistance = 10f;
-        float distanceToWaypoint = Vector3.Distance(transform.position, currentWaypoint);
-        if (distanceToWaypoint >= reachedWaypointDistance)
+        if (isResetting)
         {
-            Vector3 dirToMovePosition = (currentWaypoint - transform.position).normalized;
-            float dot = Vector3.Dot(transform.forward, dirToMovePosition);
-            if (dot > 0)
+            rb.isKinematic = true;
+            driverCollider.enabled = false;
+            transform.position = Vector3.Lerp(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position, 1.5f * Time.deltaTime);
+
+            if (Vector3.Distance(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position) < 5f)
             {
-                forwardAmount = 1f;
+                isResetting = false;
+                driverCollider.enabled = true;
+                rb.isKinematic = false;
             }
-            else
+
+        }
+        else
+        {
+
+
+            float forwardAmount = 0f;
+            float turnAmount = 0f;
+
+            float reachedWaypointDistance = 10f;
+            float distanceToWaypoint = Vector3.Distance(transform.position, currentWaypoint);
+            if (distanceToWaypoint >= reachedWaypointDistance)
             {
-                forwardAmount = -1f;
-                float reverseDistance = 25f;
-                if (distanceToWaypoint > reverseDistance)
+                Vector3 dirToMovePosition = (currentWaypoint - transform.position).normalized;
+                float dot = Vector3.Dot(transform.forward, dirToMovePosition);
+                if (dot > 0)
                 {
                     forwardAmount = 1f;
                 }
                 else
                 {
                     forwardAmount = -1f;
+                    float reverseDistance = 25f;
+                    if (distanceToWaypoint > reverseDistance)
+                    {
+                        forwardAmount = 1f;
+                    }
+                    else
+                    {
+                        forwardAmount = -1f;
+                    }
                 }
-            }
 
-            float angleToDir = Vector3.SignedAngle(transform.forward, dirToMovePosition, Vector3.up);
-            turnAmount = Mathf.Clamp(angleToDir / 45f, -1f, 1f);
+                float angleToDir = Vector3.SignedAngle(transform.forward, dirToMovePosition, Vector3.up);
+                turnAmount = Mathf.Clamp(angleToDir / 45f, -1f, 1f);
 
-            if (Mathf.Abs(angleToDir) < 2f)
-            {
-                turnAmount = 0f;
-            }
-
-
-
-            //This is the PACIFIST behaviour. If copying the waypoint code, remove this region.
-            #region pacifist behaviour
-
-            bool carIsClose = pAvoidance.DistanceToCar < 10f;
-            bool carIsCloseBehind = pAvoidance.DistanceToCarBehind < 10f;
-
-            if (pAvoidance != null && pAvoidance.ObstacleAhead)
-            {
-                avoidanceTimer = avoidanceDuration;
-
-                if (!pAvoidance.LeftBlocked)
+                if (Mathf.Abs(angleToDir) < 2f)
                 {
-                    avoidanceTurn = -1f;
+                    turnAmount = 0f;
                 }
-                else if (!pAvoidance.RightBlocked)
+
+
+
+                //This is the PACIFIST behaviour. If copying the waypoint code, remove this region.
+                #region pacifist behaviour
+
+                bool carIsClose = pAvoidance.DistanceToCar < 10f;
+                bool carIsCloseBehind = pAvoidance.DistanceToCarBehind < 10f;
+
+                if (pAvoidance != null && pAvoidance.ObstacleAhead)
                 {
-                    avoidanceTurn = 1f;
+                    avoidanceTimer = avoidanceDuration;
+
+                    if (!pAvoidance.LeftBlocked)
+                    {
+                        avoidanceTurn = -1f;
+                    }
+                    else if (!pAvoidance.RightBlocked)
+                    {
+                        avoidanceTurn = 1f;
+                    }
+                    else
+                    {
+                        avoidanceTurn = 0f;
+                    }
                 }
                 else
                 {
-                    avoidanceTurn = 0f;
+                    avoidanceTimer -= Time.deltaTime;
                 }
-            }
-            else
-            {
-                avoidanceTimer -= Time.deltaTime;
-            }
 
-            if (avoidanceTimer > 0f)
-            {
-                if (avoidanceTurn != 0f)
+                if (avoidanceTimer > 0f)
                 {
-                    turnAmount = avoidanceTurn;
+                    if (avoidanceTurn != 0f)
+                    {
+                        turnAmount = avoidanceTurn;
+                    }
+                    else
+                    {
+                        forwardAmount = -1f;
+                    }
+                }
+                if (pAvoidance != null && pAvoidance.CarAhead)
+                {
+                    yieldTimer = yieldDuration;
+                    forwardAmount = 0.5f;
+                    if (!pAvoidance.LeftBlockedCar)
+                    {
+                        avoidanceTurn = -1f;
+
+                    }
+                    else if (!pAvoidance.RightBlockedCar)
+                    {
+                        avoidanceTurn = 1f;
+                    }
+                    else
+                    {
+                        avoidanceTurn = 0f;
+                    }
+                    if (carIsClose)
+                    {
+                        if (forwardAmount > 0)
+                        {
+                            forwardAmount = -0.5f;
+
+                        }
+                        else
+                        {
+                            forwardAmount = 0f;
+
+                        }
+                    }
                 }
                 else
                 {
-                    forwardAmount = -1f;
+                    yieldTimer -= Time.deltaTime;
                 }
-            }
-            if (pAvoidance != null && pAvoidance.CarAhead)
-            {
-                yieldTimer = yieldDuration;
-                forwardAmount = 0.5f;
-                if (!pAvoidance.LeftBlockedCar)
-                {
-                    avoidanceTurn = -1f;
 
-                }
-                else if (!pAvoidance.RightBlockedCar)
+                if (yieldTimer > 0f)
                 {
-                    avoidanceTurn = 1f;
-                }
-                else
-                { 
-                    avoidanceTurn = 0f;
-                }
-                if (carIsClose)
-                {
-                    if (forwardAmount > 0)
+                    if (avoidanceTurn != 0f)
+                    {
+                        turnAmount = avoidanceTurn;
+                    }
+                    else
                     {
                         forwardAmount = -0.5f;
+                    }
+                }
+                if (pAvoidance != null && pAvoidance.CarBehind)
+                {
+                    yieldTimer = yieldDuration;
 
+                    if (!pAvoidance.RearLeftBlocked)
+                    {
+                        avoidanceTurn = -1f;
+                    }
+                    else if (!pAvoidance.RearRightBlocked)
+                    {
+                        avoidanceTurn = 1f;
                     }
                     else
                     {
-                        forwardAmount = 0f;
+                        avoidanceTurn = 0f;
+                    }
+                    if (carIsClose)
+                    {
+                        if (forwardAmount <= 0)
+                        {
+                            forwardAmount = 0.5f;
 
+                        }
+                        else
+                        {
+                            forwardAmount = 0f;
+
+                        }
                     }
                 }
-            }
-            else
-            {
-                yieldTimer -= Time.deltaTime;
-            }
-
-            if (yieldTimer > 0f)
-            {
-                if (avoidanceTurn != 0f)
-                {
-                    turnAmount = avoidanceTurn;
-                }
                 else
                 {
-                    forwardAmount = -0.5f;
+                    yieldTimer -= Time.deltaTime;
                 }
-            }
-            if (pAvoidance != null && pAvoidance.CarBehind)
-            {
-                yieldTimer = yieldDuration;
 
-                if (!pAvoidance.RearLeftBlocked)
+                if (yieldTimer > 0f)
                 {
-                    avoidanceTurn = -1f;
-                }
-                else if (!pAvoidance.RearRightBlocked)
-                {
-                    avoidanceTurn = 1f;
-                }
-                else
-                {
-                    avoidanceTurn = 0f;
-                }
-                if (carIsClose)
-                {
-                    if (forwardAmount <= 0)
+                    if (avoidanceTurn != 0f)
                     {
-                        forwardAmount = 0.5f;
-
+                        turnAmount = avoidanceTurn;
                     }
                     else
                     {
-                        forwardAmount = 0f;
-
+                        forwardAmount = -0.5f;
                     }
                 }
+
+                #endregion
             }
             else
             {
-                yieldTimer -= Time.deltaTime;
-            }
-
-            if (yieldTimer > 0f)
-            {
-                if (avoidanceTurn != 0f)
+                if (!finalLap && currentWaypointIndex == waypointPath.LastWaypoint)
                 {
-                    turnAmount = avoidanceTurn;
+                    lapNumber++;
+                    if (lapNumber >= raceManager.RaceLaps)
+                    {
+                        finalLap = true;
+                    }
                 }
-                else
+
+                if (finalLap && currentWaypointIndex == waypointPath.LastWaypoint)
                 {
-                    forwardAmount = -0.5f;
+                    //win or loss state
+                    raceFinished = true;
                 }
+                lastWaypointIndex = currentWaypointIndex;
+                waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
+                //forwardAmount = 0f;
+                //turnAmount = 0f;
             }
-
-            #endregion
-        }
-        else
-        {
-            if (!finalLap && currentWaypointIndex == waypointPath.LastWaypoint)
-            {
-                lapNumber++;
-                if (lapNumber >= raceManager.RaceLaps)
-                {
-                    finalLap = true;
-                }
-            }
-
-            if (finalLap && currentWaypointIndex == waypointPath.LastWaypoint)
-            {
-                //win or loss state
-                raceFinished = true;
-            }
-            lastWaypointIndex = currentWaypointIndex;
-            waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
-            //forwardAmount = 0f;
-            //turnAmount = 0f;
-        }
-
             carController.Drive(turnAmount, forwardAmount);
+        }
+            
     }
 
     public void SetWaypoint(Vector3 waypoint)

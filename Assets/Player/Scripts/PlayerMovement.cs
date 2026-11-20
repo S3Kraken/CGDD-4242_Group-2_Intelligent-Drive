@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour, RacingDrivers
     private InputAction movement;
     private RaceManager raceManager;
     private Collider driverCollider;
+    private Rigidbody rb;
 
     private Vector3 currentWaypoint;
     private int lastWaypointIndex;
@@ -80,6 +81,7 @@ public class PlayerMovement : MonoBehaviour, RacingDrivers
         movement = player.actions["Move"];
         raceManager = FindAnyObjectByType<RaceManager>();
         driverCollider = GetComponent<Collider>();
+        rb = GetComponent<Rigidbody>();
 
         lapNumber = 0;
     }
@@ -89,10 +91,10 @@ public class PlayerMovement : MonoBehaviour, RacingDrivers
     {
         Vector2 inputVector = movement.ReadValue<Vector2>();
 
-        //This if statements dictates if the player or the ai is driving.
-        //it is supposed to be like when you finish a race in MK and the character continues to drive
+       //this is for reseting the driver smoothly
         if (isResetting)
         {
+            rb.isKinematic = true;
             driverCollider.enabled = false;
             transform.position = Vector3.Lerp(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position, 1.5f * Time.deltaTime);
             
@@ -100,8 +102,12 @@ public class PlayerMovement : MonoBehaviour, RacingDrivers
             {
                 isResetting = false;
                 driverCollider.enabled = true;
+                rb.isKinematic = false;
             }
+
         }
+        //This if statements dictates if the player or the ai is driving.
+        //it is supposed to be like when you finish a race in MK and the character continues to drive
         else if (!raceFinished)
         {
             steerDirection = inputVector.x;
