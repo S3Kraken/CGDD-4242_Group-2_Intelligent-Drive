@@ -14,6 +14,7 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
     [SerializeField] private Vector3 currentWaypoint;
     private int currentWaypointIndex;
     private int nextWaypointIndex;
+    private int lastWaypointIndex;
 
     //this is if you want the collision recovery
     #region collision recovery variables
@@ -39,6 +40,9 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
     [SerializeField] List<GameObject> Targets = new List<GameObject>();
     [SerializeField] List<GameObject> inRangeDrivers = new List<GameObject>();
     [SerializeField] GameObject lockedTarget;
+    private Rigidbody rb;
+    private Collider driverCollider;
+    private bool isResetting = false;
     bool targetLocked = false;
 
     private int lapNumber = 1;
@@ -73,6 +77,13 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
             return (float)currentWaypointIndex / waypointPath.WaypointCount;
         }
     }
+    public void ResetDriver()
+    {
+        isResetting = true;
+        //driverCollider.enabled = false;
+        //transform.position = waypointPath.GetCurrentWaypoint(lastWaypointIndex).position;
+        //driverCollider.enabled = true;
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -100,16 +111,34 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
 
         HuntTargets();
 
-        //Basic Driver Waypoint following
-        float forwardAmount, turnAmount;
-        FollowWaypoints(out forwardAmount, out turnAmount);
-        carController.Drive(turnAmount, forwardAmount);
+        if (isResetting)
+        {
+            rb.isKinematic = true;
+            driverCollider.enabled = false;
+            transform.position = Vector3.Lerp(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position, 1.5f * Time.deltaTime);
+
+            if (Vector3.Distance(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position) < 5f)
+            {
+                isResetting = false;
+                driverCollider.enabled = true;
+                rb.isKinematic = false;
+            }
+
+        }
+        else
+        {
+            //Basic Driver Waypoint following
+            float forwardAmount, turnAmount;
+            FollowWaypoints(out forwardAmount, out turnAmount);
+            carController.Drive(turnAmount, forwardAmount);
+        }
     }
 
     private void FollowWaypoints(out float forwardAmount, out float turnAmount)
     {
         if (waypointPath.GetCurrentWaypoint(currentWaypointIndex) != null && !targetLocked)
         {
+            lastWaypointIndex = currentWaypointIndex;
             SetWaypoint(waypointPath.GetCurrentWaypoint(currentWaypointIndex).position);
         }
         else

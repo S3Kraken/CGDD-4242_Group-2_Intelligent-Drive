@@ -150,9 +150,9 @@ GameObject:
   - component: {fileID: 2504958513836893532}
   - component: {fileID: 4969058918918537859}
   - component: {fileID: 5469940772851290690}
+  - component: {fileID: 5035433159467913063}
   - component: {fileID: 972893741289576154}
   - component: {fileID: 9169015853296015089}
-  - component: {fileID: 5035433159467913063}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -282,6 +282,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &5035433159467913063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4063955948220333532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99cdd6e1b72a7fd4abdc30a1369ce0d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  recoveryReverseTime: 1
+  recoveryTurnTime: 0.75
 --- !u!114 &972893741289576154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -327,20 +341,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 7852125053855357383}
---- !u!114 &5035433159467913063
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4063955948220333532}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99cdd6e1b72a7fd4abdc30a1369ce0d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  recoveryReverseTime: 1
-  recoveryTurnTime: 0.75
 --- !u!1001 &9119156762414815208
 PrefabInstance:
   m_ObjectHideFlags: 0

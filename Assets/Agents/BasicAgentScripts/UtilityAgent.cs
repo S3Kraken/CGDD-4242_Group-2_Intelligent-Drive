@@ -10,15 +10,20 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
     private CarController carController;
     private WaypointPath waypointPath;
     private SpeedPad[] allPads;
+    private Rigidbody rb;
+    private Collider driverCollider;
 
     private Vector3 currentWaypoint;
     private int currentWaypointIndex;
     private int nextWaypointIndex;
+    private int lastWaypointIndex;
 
     private SpeedPad currentTargetPad;
     private readonly Dictionary<SpeedPad, float> scores = new Dictionary<SpeedPad, float>();
     private int padsCollected;
     private float lapStartTime = -1f;
+
+    private bool isResetting = false;
 
     [Header("Utility tuning")]
     [SerializeField] private bool usePads = true;           // untick for the waypoint-only baseline run
@@ -77,6 +82,13 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
                    waypointPath.WaypointCount;
         }
     }
+    public void ResetDriver()
+    {
+        isResetting = true;
+        //driverCollider.enabled = false;
+        //transform.position = waypointPath.GetCurrentWaypoint(lastWaypointIndex).position;
+        //driverCollider.enabled = true;
+    }
 
     void Start()
     {
@@ -85,6 +97,8 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
         currentWaypointIndex = waypointPath.CurrentIndex;
         nextWaypointIndex = waypointPath.NextIndex;
         allPads = FindObjectsByType<SpeedPad>(FindObjectsSortMode.None);
+        rb = GetComponent<Rigidbody>();
+        driverCollider = GetComponent<Collider>();
     }
 
 
@@ -95,29 +109,48 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
         {
             return;
         }
-
-        Transform target = waypointPath.GetCurrentWaypoint(currentWaypointIndex);
-        if (target != null)
+        if (isResetting)
         {
-            SetWaypoint(target.position);
-        }
+            rb.isKinematic = true;
+            driverCollider.enabled = false;
+            transform.position = Vector3.Lerp(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position, 1.5f * Time.deltaTime);
 
-        float reachedWaypointDistance = 10f;
-        float distanceToWaypoint = Vector3.Distance(transform.position, currentWaypoint);
+            if (Vector3.Distance(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position) < 5f)
+            {
+                isResetting = false;
+                driverCollider.enabled = true;
+                rb.isKinematic = false;
+            }
 
-        if (distanceToWaypoint >= reachedWaypointDistance)
-        {
-            currentTargetPad = usePads ? ChooseTarget() : null;
-            Vector3 destination = currentTargetPad != null ? currentTargetPad.transform.position : currentWaypoint;
-            Debug.DrawLine(transform.position, destination, currentTargetPad != null ? Color.green : Color.yellow);
-            MoveToward(destination);
         }
         else
         {
-            waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
-            LogLap();
-            carController.Drive(0f, 0f);
+            Transform target = waypointPath.GetCurrentWaypoint(currentWaypointIndex);
+            if (target != null)
+            {
+                SetWaypoint(target.position);
+            }
+
+            float reachedWaypointDistance = 10f;
+            float distanceToWaypoint = Vector3.Distance(transform.position, currentWaypoint);
+
+            if (distanceToWaypoint >= reachedWaypointDistance)
+            {
+                currentTargetPad = usePads ? ChooseTarget() : null;
+                Vector3 destination = currentTargetPad != null ? currentTargetPad.transform.position : currentWaypoint;
+                Debug.DrawLine(transform.position, destination, currentTargetPad != null ? Color.green : Color.yellow);
+                MoveToward(destination);
+            }
+            else
+            {
+                lastWaypointIndex = currentWaypointIndex;
+                waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
+                LogLap();
+                carController.Drive(0f, 0f);
+            }
         }
+
+        
     }
 
     //private void MoveToward(Vector3 destination)

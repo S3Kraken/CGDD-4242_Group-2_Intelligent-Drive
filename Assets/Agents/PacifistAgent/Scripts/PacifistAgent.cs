@@ -75,28 +75,6 @@ public class PacifistAgent : MonoBehaviour, RacingDrivers
     public float recoveryTurnTime = 0.75f;
     #endregion
 
-    private int lapNumber = 1;
-
-    public int CurrentWaypoint => currentWaypointIndex;
-
-    public int LapNumber => lapNumber;
-
-    public float DistanceToWaypoint =>
-        Vector3.Distance(transform.position, currentWaypoint);
-
-    public Transform DriverTransform => transform;
-
-    public float RaceProgress
-    {
-        get
-        {
-            if (waypointPath == null || waypointPath.WaypointCount == 0)
-                return 0f;
-
-            return (float)currentWaypointIndex /
-                   waypointPath.WaypointCount;
-        }
-    }
 
 
     void Start()
@@ -321,6 +299,8 @@ public class PacifistAgent : MonoBehaviour, RacingDrivers
                 if (!finalLap && currentWaypointIndex == waypointPath.LastWaypoint)
                 {
                     lapNumber++;
+                    Debug.Log(gameObject.name +
+                          " completed lap " + lapNumber);
                     if (lapNumber >= raceManager.RaceLaps)
                     {
                         finalLap = true;
@@ -336,27 +316,7 @@ public class PacifistAgent : MonoBehaviour, RacingDrivers
                 waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
                 //forwardAmount = 0f;
                 //turnAmount = 0f;
-            }
-
-            
-        
-        else
-        {
-            int previousWaypoint = currentWaypointIndex;
-
-            waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex
-            );
-
-            // Check if the driver completed a lap.
-            if (currentWaypointIndex < previousWaypoint)
-            {
-                lapNumber++;
-
-                Debug.Log(gameObject.name +
-                          " completed lap " + lapNumber);
-            }
-        }
-    
+            } 
 
             carController.Drive(turnAmount, forwardAmount);
         }
@@ -409,8 +369,4 @@ public class PacifistAgent : MonoBehaviour, RacingDrivers
         collisionsCount++;
     }
 
-    public void ReceiveHotspotInformation()
-    {
-      
-    }
 }

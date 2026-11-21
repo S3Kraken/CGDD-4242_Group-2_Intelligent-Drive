@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
+using static UnityEngine.GraphicsBuffer;
 
 public class RaceManager : MonoBehaviour
 {
@@ -34,7 +35,8 @@ public class RaceManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning(driverObject.name + " does not implement RaceDriver.");
+                string targetName = driverObject != null ? driverObject.name : "None";
+                Debug.LogWarning(targetName + " does not implement RaceDriver.");
             }
         }
     }
@@ -46,9 +48,13 @@ public class RaceManager : MonoBehaviour
         {
             ReceiveDriverProgress(driver);
         }
-
-        UpdateLeaderboard();
-        leaderboardUI.UpdateLeaderboard(drivers);
+        
+            UpdateLeaderboard();
+        if (leaderboardUI != null)
+        {
+            leaderboardUI.UpdateLeaderboard(drivers);
+        }
+        
     }
 
     // Receives waypoint, distance, and lap information from a driver.

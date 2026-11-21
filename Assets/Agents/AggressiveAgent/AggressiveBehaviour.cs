@@ -27,14 +27,19 @@ public class AggressiveBehaviour : MonoBehaviour, RacingDrivers
     [SerializeField] List<GameObject> Targets = new List<GameObject>();
     [SerializeField] List<GameObject> inRangeDrivers = new List<GameObject>();
     [SerializeField] GameObject lockedTarget;
+    private Collider driverCollider;
+    private Rigidbody rb;
     bool targetLocked = false;
 
     bool hadRecentCollision = false;
     bool forceWaypointTravel = false;
+    private bool isResetting = false;
     public float timeSinceLastWaypoint = 0.0f;
     public float timeSinceLastCollision = 0.0f;
     private int waypointsCrossed = 0;
     private int lapNumber = 1;
+    private int lastWaypointIndex = 0;
+
 
     public int CurrentWaypoint => currentWaypointIndex;
 
@@ -56,11 +61,20 @@ public class AggressiveBehaviour : MonoBehaviour, RacingDrivers
                    waypointPath.WaypointCount;
         }
     }
+    public void ResetDriver()
+    {
+        isResetting = true;
+        //driverCollider.enabled = false;
+        //transform.position = waypointPath.GetCurrentWaypoint(lastWaypointIndex).position;
+        //driverCollider.enabled = true;
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         carController = GetComponent<CarController>();
         waypointPath = FindAnyObjectByType<WaypointPath>();
+        rb = GetComponent<Rigidbody>();
+        driverCollider = GetComponent<Collider>();
         currentWaypointIndex = waypointPath.CurrentIndex;
         nextWaypointIndex = waypointPath.NextIndex;
     }
@@ -96,19 +110,38 @@ public class AggressiveBehaviour : MonoBehaviour, RacingDrivers
         {
             return;
         }
+        if (isResetting)
+        {
+            rb.isKinematic = true;
+            driverCollider.enabled = false;
+            transform.position = Vector3.Lerp(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position, 1.5f * Time.deltaTime);
 
-        RamIntoOthers();
+            if (Vector3.Distance(transform.position, waypointPath.GetCurrentWaypoint(lastWaypointIndex).position) < 5f)
+            {
+                isResetting = false;
+                driverCollider.enabled = true;
+                rb.isKinematic = false;
+            }
 
-        //Basic Driver Waypoint following
-        float forwardAmount, turnAmount;
-        FollowWaypoints(out forwardAmount, out turnAmount);
-        carController.Drive(turnAmount, forwardAmount);
+        }
+        else
+        {
+                RamIntoOthers();
+
+                //Basic Driver Waypoint following
+                float forwardAmount, turnAmount;
+                FollowWaypoints(out forwardAmount, out turnAmount);
+                carController.Drive(turnAmount, forwardAmount);
+        }
     }
+
+            
 
     private void FollowWaypoints(out float forwardAmount, out float turnAmount)
     {
         if (waypointPath.GetCurrentWaypoint(currentWaypointIndex) != null && !targetLocked)
         {
+            lastWaypointIndex = currentWaypointIndex;
             SetWaypoint(waypointPath.GetCurrentWaypoint(currentWaypointIndex).position);
         }
         else
