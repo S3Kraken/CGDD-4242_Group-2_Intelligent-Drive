@@ -10,7 +10,7 @@ public class DefensiveDriver : MonoBehaviour, RacingDrivers
     public float turnSpeed = 5f;
     public float acceleration = 10f;
     [Range(0.1f, 1f)] public float blockedSpeedMultiplier = 0.5f;
-    public string opponentTag = "Opponent";
+    public string opponentTag = "Driver";
     public float frontDistance = 8f;
     public float sideDistance = 4f;
     public float frontAngle = 25f;
@@ -51,7 +51,7 @@ public class DefensiveDriver : MonoBehaviour, RacingDrivers
 
     public void ReceiveHotspotInformation()
     {
-        // Store or process collision hotspot information here.
+        
     }
     void Start()
     {
@@ -163,7 +163,6 @@ public class DefensiveDriver : MonoBehaviour, RacingDrivers
         {
             currentWaypoint++;
 
-            // If the driver completes all waypoints, start another lap.
             if (currentWaypoint >= waypoints.Length)
             {
                 currentWaypoint = 0;

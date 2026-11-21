@@ -321,7 +321,6 @@ public class PacifistAgent : MonoBehaviour, RacingDrivers
 
     public void ReceiveHotspotInformation()
     {
-        Debug.Log(gameObject.name +
-                  " received hotspot information.");
+      
     }
 }

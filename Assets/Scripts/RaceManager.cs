@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class RaceManager : MonoBehaviour
 {
-    // Drag all AI driver objects into this array in the Inspector.
+    [SerializeField] private Leaderboard leaderboardUI;
     public MonoBehaviour[] driverObjects;
 
-    // Stores all registered drivers using the shared interface.
     private List<RacingDrivers> drivers = new List<RacingDrivers>();
 
-    // Stores the latest progress information for each driver.
     private Dictionary<RacingDrivers, float> driverProgress =
         new Dictionary<RacingDrivers, float>();
 
@@ -18,8 +17,6 @@ public class RaceManager : MonoBehaviour
     {
         InitializeDrivers();
     }
-
-    // Finds and registers each driver in the race.
     void InitializeDrivers()
     {
         foreach (MonoBehaviour driverObject in driverObjects)
@@ -47,6 +44,7 @@ public class RaceManager : MonoBehaviour
         }
 
         UpdateLeaderboard();
+        leaderboardUI.UpdateLeaderboard(drivers);
     }
 
     // Receives waypoint, distance, and lap information from a driver.

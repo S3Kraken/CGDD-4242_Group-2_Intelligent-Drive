@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UtilityAgent : MonoBehaviour
+public class UtilityAgent : MonoBehaviour, RacingDrivers
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     //private Transform targetWaypointTransform;
@@ -43,6 +43,40 @@ public class UtilityAgent : MonoBehaviour
     public float recoveryReverseTime = 1.0f;
     public float recoveryTurnTime = 0.75f;
     #endregion
+
+    private int lapNumber = 1;
+
+    public int CurrentWaypoint => currentWaypointIndex;
+
+    public int LapNumber => lapNumber;
+
+    public float DistanceToWaypoint
+    {
+        get
+        {
+            if (waypointPath == null)
+                return 0f;
+
+            Transform waypoint =
+                waypointPath.GetCurrentWaypoint(currentWaypointIndex);
+
+            return Vector3.Distance(transform.position, waypoint.position);
+        }
+    }
+
+    public Transform DriverTransform => transform;
+
+    public float RaceProgress
+    {
+        get
+        {
+            if (waypointPath == null || waypointPath.WaypointCount == 0)
+                return 0f;
+
+            return (float)currentWaypointIndex /
+                   waypointPath.WaypointCount;
+        }
+    }
 
     void Start()
     {
@@ -287,6 +321,10 @@ public class UtilityAgent : MonoBehaviour
             y += 20;
             GUI.Label(new Rect(10, y, 500, 20), $"{entry.Key.name}: {entry.Value:F2} s");
         }
+    }
+    public void ReceiveHotspotInformation()
+    {
+      
     }
 }
 

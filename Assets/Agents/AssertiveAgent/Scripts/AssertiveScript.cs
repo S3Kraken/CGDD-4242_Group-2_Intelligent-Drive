@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 
-public class AssertiveScript : MonoBehaviour
+public class AssertiveScript : MonoBehaviour, RacingDrivers
 {
     private CarController carController;
     private WaypointPath waypointPath;
@@ -41,6 +41,38 @@ public class AssertiveScript : MonoBehaviour
     [SerializeField] GameObject lockedTarget;
     bool targetLocked = false;
 
+    private int lapNumber = 1;
+
+    public int CurrentWaypoint => currentWaypointIndex;
+    public int LapNumber => lapNumber;
+    public Transform DriverTransform => transform;
+
+    public float DistanceToWaypoint
+    {
+        get
+        {
+            if (waypointPath == null)
+                return 0f;
+
+            Transform waypoint = waypointPath.GetCurrentWaypoint(currentWaypointIndex);
+
+            if (waypoint == null)
+                return 0f;
+
+            return Vector3.Distance(transform.position, waypoint.position);
+        }
+    }
+
+    public float RaceProgress
+    {
+        get
+        {
+            if (waypointPath == null || waypointPath.WaypointCount == 0)
+                return 0f;
+
+            return (float)currentWaypointIndex / waypointPath.WaypointCount;
+        }
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -170,9 +202,15 @@ public class AssertiveScript : MonoBehaviour
         }
         else
         {
+            int previousWaypoint = currentWaypointIndex;
             waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
             //forwardAmount = 0f;
             //turnAmount = 0f;
+            if (currentWaypointIndex < previousWaypoint)
+            {
+                lapNumber++;
+                Debug.Log(gameObject.name + " completed lap " + lapNumber);
+            }
         }
     }
 
@@ -285,5 +323,9 @@ public class AssertiveScript : MonoBehaviour
                 carController.SetTurnDegrees(setTurnDegrees);
             }
         }
+    }
+    public void ReceiveHotspotInformation()
+    {
+       
     }
 }
