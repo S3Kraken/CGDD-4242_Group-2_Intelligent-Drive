@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UtilityAgent : MonoBehaviour
+public class UtilityAgent : MonoBehaviour, RacingDrivers
 {
     //Start is called once before the first execution of Update after the MonoBehaviour is created
     //private Transform targetWaypointTransform;
@@ -34,6 +34,43 @@ public class UtilityAgent : MonoBehaviour
     [SerializeField] private float avoidDistance = 10f;     //AVOID_DISTANCE (m)
     [SerializeField] private float avoidStrength = 0.8f;    //AVOID_STRENGTH
     [SerializeField] private float carHalfWidth = 1.2f;
+
+    private int lapNumber = 1;
+
+    public int CurrentWaypoint => currentWaypointIndex;
+    public int LapNumber => lapNumber;
+    public float DistanceToWaypoint => Vector3.Distance(transform.position, currentWaypoint);
+    public Transform DriverTransform => transform;
+    public float RaceProgress => waypointPath == null || waypointPath.WaypointCount == 0
+        ? 0f
+        : (float)currentWaypointIndex / waypointPath.WaypointCount;
+
+    public void ReceiveHotspotInformation()
+    {
+    }
+
+    public void ResetDriver()
+    {
+        StopAllCoroutines();
+        recoveringFromCollision = false;
+
+        int count = waypointPath.WaypointCount;
+        int previousIndex = (currentWaypointIndex - 1 + count) % count;
+        Vector3 respawnPosition = waypointPath.GetCurrentWaypoint(previousIndex).position;
+        Vector3 lookDirection = waypointPath.GetCurrentWaypoint(currentWaypointIndex).position - respawnPosition;
+        lookDirection.y = 0f;
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.position = respawnPosition;
+        if (lookDirection != Vector3.zero)
+        {
+            rb.rotation = Quaternion.LookRotation(lookDirection);
+        }
+
+        carController.Drive(0f, 0f);
+    }
 
     //this is if you want the collision recovery
     #region collision recovery variables
@@ -80,32 +117,16 @@ public class UtilityAgent : MonoBehaviour
         }
         else
         {
+            int previousWaypoint = currentWaypointIndex;
             waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
+            if (currentWaypointIndex < previousWaypoint)
+            {
+                lapNumber++;
+            }
             LogLap();
             carController.Drive(0f, 0f);
         }
     }
-
-    //private void MoveToward(Vector3 destination)
-    //{
-    //    Vector3 dirToDestination = (destination - transform.position).normalized;
-    //    float distance = Vector3.Distance(transform.position, destination);
-
-    //    // Drive forward, unless the destination is behind us and close: then reverse
-    //    float forwardAmount = 1f;
-    //    float dot = Vector3.Dot(transform.forward, dirToDestination);
-    //    float reverseDistance = 25f;
-    //    if (dot <= 0 && distance <= reverseDistance)
-    //    {
-    //        forwardAmount = -1f;
-    //    }
-
-    //    // Steer fully left or right toward the destination
-    //    float angleToDir = Vector3.SignedAngle(transform.forward, dirToDestination, Vector3.up);
-    //    float turnAmount = angleToDir > 0 ? 1f : -1f;
-
-    //    carController.Drive(turnAmount, forwardAmount);
-    //}
 
     private void MoveToward(Vector3 destination)
     {

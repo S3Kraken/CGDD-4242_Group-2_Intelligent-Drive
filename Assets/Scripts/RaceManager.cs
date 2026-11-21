@@ -4,6 +4,61 @@ using UnityEngine;
 
 public class RaceManager : MonoBehaviour
 {
+    // For Rigidbody Collision and Speed Pad Monitoring.
+    private Dictionary<RacingDrivers, int> collisionsCaused = new Dictionary<RacingDrivers, int>();
+    private Dictionary<RacingDrivers, int> collisionsTaken = new Dictionary<RacingDrivers, int>();
+    private Dictionary<RacingDrivers, int> wallHits = new Dictionary<RacingDrivers, int>();
+    private Dictionary<RacingDrivers, int> padsCollected = new Dictionary<RacingDrivers, int>();
+    private Dictionary<RacingDrivers, RacingDrivers> lastAttacker = new Dictionary<RacingDrivers, RacingDrivers>();
+
+    public void ReportCollision(RacingDrivers attacker, RacingDrivers victim)
+    {
+        AddOne(collisionsCaused, attacker);
+        AddOne(collisionsTaken, victim);
+        lastAttacker[victim] = attacker;
+        Debug.Log(attacker.DriverTransform.name + " hit " + victim.DriverTransform.name);
+    }
+
+    public void ReportWallHit(RacingDrivers driver)
+    {
+        AddOne(wallHits, driver);
+        Debug.Log(driver.DriverTransform.name + " hit a wall");
+    }
+
+    public void ReportPadCollected(SpeedPad pad, RacingDrivers driver)
+    {
+        AddOne(padsCollected, driver);
+        Debug.Log(driver.DriverTransform.name + " collected " + pad.name);
+    }
+
+    public RacingDrivers GetLastAttacker(RacingDrivers victim)
+    {
+        RacingDrivers attacker;
+        lastAttacker.TryGetValue(victim, out attacker);
+        return attacker;
+    }
+
+    public int GetCollisionsCaused(RacingDrivers driver) { return GetCount(collisionsCaused, driver); }
+    public int GetCollisionsTaken(RacingDrivers driver) { return GetCount(collisionsTaken, driver); }
+    public int GetWallHits(RacingDrivers driver) { return GetCount(wallHits, driver); }
+    public int GetPadsCollected(RacingDrivers driver) { return GetCount(padsCollected, driver); }
+
+    private void AddOne(Dictionary<RacingDrivers, int> counts, RacingDrivers driver)
+    {
+        int count;
+        counts.TryGetValue(driver, out count);
+        counts[driver] = count + 1;
+    }
+
+    private int GetCount(Dictionary<RacingDrivers, int> counts, RacingDrivers driver)
+    {
+        int count;
+        counts.TryGetValue(driver, out count);
+        return count;
+    }
+
+    // End of Rigidbody Collision and Speed Pad Monitoring changes.
+
     // Drag all AI driver objects into this array in the Inspector.
     public MonoBehaviour[] driverObjects;
 
