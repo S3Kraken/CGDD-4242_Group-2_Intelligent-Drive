@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 7051440709339671273}
   - component: {fileID: 1072389973547886926}
   - component: {fileID: 9136677287683913775}
-  - component: {fileID: 242996636676182663}
+  - component: {fileID: 5817966110941904059}
   - component: {fileID: 8332987606432657480}
   m_Layer: 0
   m_Name: AggressiveDriver
@@ -211,19 +211,18 @@ MonoBehaviour:
   <acceleration>k__BackingField: 20
   <turnDegrees>k__BackingField: 90
   <grip>k__BackingField: 5
---- !u!114 &242996636676182663
+--- !u!114 &5817966110941904059
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4647588160724480915}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e07dfb6dcbfe954780da8862a1d6a8b, type: 3}
+  m_Script: {fileID: 11500000, guid: eb9fd1a439336d946be95f92728025e8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PacifistObstacleAvoidance
-  sensorOrigin: {fileID: 6886252502615521743}
+  m_EditorClassIdentifier: Assembly-CSharp::BasicObstacleAvoidance
   obstacleMask:
     serializedVersion: 2
     m_Bits: 64
