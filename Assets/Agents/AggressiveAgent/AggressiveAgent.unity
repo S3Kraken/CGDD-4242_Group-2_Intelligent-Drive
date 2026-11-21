@@ -3092,6 +3092,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 242996636676182663, guid: 508dfee6bcb2e8d4d9898182f3c2a24e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4647588160724480915, guid: 508dfee6bcb2e8d4d9898182f3c2a24e, type: 3}
       propertyPath: m_Name
       value: AggressiveDriver

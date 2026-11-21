@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading;
 using NUnit.Framework;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using static UnityEngine.GraphicsBuffer;
@@ -35,6 +37,8 @@ public class AggressiveBehaviour : MonoBehaviour, RacingDrivers
     public float timeSinceLastCollision = 0.0f;
     private int waypointsCrossed = 0;
     private int lapNumber = 1;
+
+    bool truceMade;
 
     public int CurrentWaypoint => currentWaypointIndex;
 
@@ -243,32 +247,41 @@ public class AggressiveBehaviour : MonoBehaviour, RacingDrivers
         {
             float distance = 0.0f;
             float previousDistance = float.MaxValue;
+
             if (!lockedTarget)
             {
-                foreach (var target in inRangeDrivers)
+                foreach (GameObject target in inRangeDrivers)
                 {
+
+                    //Don't check assertive agents if the truce is made.
+                    if (truceMade && target.TryGetComponent<AssertiveScript>(out AssertiveScript assertive))
+                        continue;
+
+
                     // Finds who is closest to the agent, then picks that one to be rammed into.
                     distance = Vector3.Distance(this.gameObject.transform.position, target.transform.position);
                     if (distance < previousDistance)
                     {
+                        previousDistance = distance;
                         lockedTarget = target;
                     }
-                    previousDistance = distance;
 
                 }
 
-                targetLocked = true;
-                SetWaypoint(lockedTarget.transform.position);
+                if (lockedTarget != null)
+                {
+                    targetLocked = true;
+                    SetWaypoint(lockedTarget.transform.position);
 
-                carController.SetGrip(100);
-                carController.SetAcceleration(50);
-                carController.SetTurnDegrees(120);
+                    carController.SetGrip(100);
+                    carController.SetAcceleration(50);
+                    carController.SetTurnDegrees(120);
 
-                //Debug.Log("Locked on to " + target);
+                    //Debug.Log("Locked on to " + target);}
+                }
             }
         }
     }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Driver"))
@@ -293,6 +306,58 @@ public class AggressiveBehaviour : MonoBehaviour, RacingDrivers
             }
         }
     }
+
+
+    #region Truce Methods
+
+
+    //Called from the assertive driver and passes itself.
+    //50% chance for the truce to work and returns true if it did and false otherwise.
+    public bool TryTruce(GameObject assertiveDriver)
+    {
+        if (Random.Range(0, 2) == 1)
+        {
+            TruceMade(assertiveDriver);
+            return true;
+        }
+        return false;
+    }
+
+
+    public void TruceMade(GameObject assertiveDriver)
+    {
+
+        //set the truce var to true
+        truceMade = true;
+
+
+        //remove the assertive driver from the inRange list and make sure it's not a 
+        //locked target anymore
+
+        inRangeDrivers.Remove(assertiveDriver);
+
+        if (assertiveDriver == lockedTarget)
+        {
+            lockedTarget = null;
+            targetLocked = false;
+
+            carController.SetGrip(5);
+            carController.SetAcceleration(40);
+            carController.SetTurnDegrees(90);
+        }
+
+        StartCoroutine(EndTruce());
+    }
+
+    IEnumerator EndTruce() //Ends the truce after 20s
+    {
+        yield return new WaitForSeconds(20f);
+        truceMade = false;
+    }
+
+
+    #endregion
+
     public void ReceiveHotspotInformation()
     {
 

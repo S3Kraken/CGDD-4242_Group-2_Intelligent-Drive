@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
+using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
@@ -35,11 +36,16 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
     float setGrip;
     float setTurnDegrees;
 
-
+    //Targeting vars
     [SerializeField] List<GameObject> Targets = new List<GameObject>();
     [SerializeField] List<GameObject> inRangeDrivers = new List<GameObject>();
     [SerializeField] GameObject lockedTarget;
     bool targetLocked = false;
+
+    //Truce vars
+    [SerializeField] int aggressiveAgentCollisions = 0;
+    float truceCollisonTimeLimit = 20f;
+    [SerializeField] bool truceMade;
 
     private int lapNumber = 1;
 
@@ -91,8 +97,6 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
     // Update is called once per frame
     void Update()
     {
-
-
         if (recoveringFromCollision)
         {
             return;
@@ -247,12 +251,33 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
     }
     public void OnCollisionEnter(Collision collision)
     {
+        //Ignore ground and road stuff
         if (collision.gameObject.name == "Ground" || collision.gameObject.name == "Road")
             return;
 
+
         if (collision.gameObject.CompareTag("Driver"))
         {
+
             GameObject colGO = collision.gameObject;
+
+
+            //If we hit the aggressive agent
+            if (colGO.TryGetComponent<AggressiveBehaviour>(out AggressiveBehaviour aggDriver))
+            {
+
+                //increment the counter and call the coroutine to decrement it after 20s
+
+                aggressiveAgentCollisions++;
+                StartCoroutine(DecrementAggressiveCollisonCountAfterTimeLimit());
+
+                //if there have been 4 or more collisions with aggressive in the past 20 seconds,
+                //call a truce for 20s.
+                if (aggressiveAgentCollisions >= 4 && !truceMade)
+                {
+                    TryTruce(aggDriver);
+                }
+            }
 
             //if we hit the locked on driver
             if (targetLocked && lockedTarget == colGO)
@@ -265,8 +290,16 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
                 return;
             }
 
+            //if the collision agent isn't in the list, add it
             if (!Targets.Contains(colGO))
+            {
+
+                //if we have a truce and the agent is the aggressive agent, don't add it
+                if (truceMade && colGO == aggDriver.gameObject)
+                    return;
+
                 Targets.Add(colGO);
+            }
             return;
         }
 
@@ -304,6 +337,7 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
     {
         if (other.gameObject.CompareTag("Driver"))
         {
+
             inRangeDrivers.Add(other.gameObject);
         }
     }
@@ -313,6 +347,7 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
         if (other.gameObject.CompareTag("Driver"))
         {
             inRangeDrivers.Remove(other.gameObject);
+
             if (other.gameObject == lockedTarget)
             {
                 lockedTarget = null;
@@ -324,8 +359,61 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
             }
         }
     }
+
+    #region Truce Methods
+
+    //50% chance to work. If it does we check the same method on teh aggressive driver
+    //and see if it works. If it does, start the truce for 20s.
+    public void TryTruce(AggressiveBehaviour aggDriver)
+    {
+        if (Random.Range(0, 2) == 1)
+        {
+            //Debug.Log("Assertive accepted");
+
+            if (aggDriver.TryTruce(this.gameObject))
+            {
+                //Debug.Log("Truce Formed!");
+
+                TruceMade(aggDriver.gameObject); //Start the truce
+
+                StartCoroutine(EndTruce()); //End the truce in 20s
+            }
+        }
+    }
+    public void TruceMade(GameObject aggDriver)
+    {
+        truceMade = true; //set the var
+
+        Targets.Remove(aggDriver); //remove aggressive from the target list
+
+        if (aggDriver == lockedTarget) //make sure it's no longer the locked target.
+        {
+            lockedTarget = null;
+            targetLocked = false;
+
+            carController.SetGrip(setGrip);
+            carController.SetAcceleration(setAccel);
+            carController.SetTurnDegrees(setTurnDegrees);
+        }
+    }
+    IEnumerator EndTruce()
+    {
+        yield return new WaitForSeconds(20f);
+        truceMade = false;
+    }
+
+
+    IEnumerator DecrementAggressiveCollisonCountAfterTimeLimit()
+    {
+        yield return new WaitForSeconds(truceCollisonTimeLimit);
+        aggressiveAgentCollisions--;
+    }
+
+
+    #endregion
+
     public void ReceiveHotspotInformation()
     {
-       
+
     }
 }
