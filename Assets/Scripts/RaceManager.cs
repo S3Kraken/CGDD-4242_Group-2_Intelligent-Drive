@@ -13,6 +13,10 @@ public class RaceManager : MonoBehaviour
     private Dictionary<RacingDrivers, float> driverProgress =
         new Dictionary<RacingDrivers, float>();
 
+    [SerializeField] private int raceLaps = 3;
+
+    public int RaceLaps { get { return raceLaps; } }
+
     void Start()
     {
         InitializeDrivers();
@@ -81,6 +85,13 @@ public class RaceManager : MonoBehaviour
         foreach (RacingDrivers driver in drivers)
         {
             driver.ReceiveHotspotInformation();
+        }
+    }
+    public void ResetDriver(RacingDrivers driver)
+    {
+        if (driver != null)
+        {
+            driver.ResetDriver();
         }
     }
 }
