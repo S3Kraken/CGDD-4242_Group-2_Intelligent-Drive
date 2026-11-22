@@ -48,7 +48,8 @@ GameObject:
   - component: {fileID: 9136677287683913775}
   - component: {fileID: 242996636676182663}
   - component: {fileID: 8332987606432657480}
-  m_Layer: 0
+  - component: {fileID: 7747199758148405043}
+  m_Layer: 7
   m_Name: AggressiveDriver
   m_TagString: Driver
   m_Icon: {fileID: 0}
@@ -251,3 +252,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 1, z: 6.5}
   m_Center: {x: 0, y: 0, z: 2.5}
+--- !u!114 &7747199758148405043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4647588160724480915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 763d01ce7ac79ca4c936d46af08a0af6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CollisionSensor
+  ignoredLayers:
+    serializedVersion: 2
+    m_Bits: 264
+  hitCooldown: 0.25

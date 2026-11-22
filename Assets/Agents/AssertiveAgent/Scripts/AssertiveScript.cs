@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 
-public class AssertiveScript : MonoBehaviour
+public class AssertiveScript : MonoBehaviour, RacingDrivers
 {
     private CarController carController;
     private WaypointPath waypointPath;
@@ -40,6 +40,47 @@ public class AssertiveScript : MonoBehaviour
     [SerializeField] List<GameObject> inRangeDrivers = new List<GameObject>();
     [SerializeField] GameObject lockedTarget;
     bool targetLocked = false;
+
+    // RacingDrivers Interface Implementation Start
+
+    private int lapNumber = 1;
+
+    public int CurrentWaypoint => currentWaypointIndex;
+    public int LapNumber => lapNumber;
+    public float DistanceToWaypoint => Vector3.Distance(transform.position, currentWaypoint);
+    public Transform DriverTransform => transform;
+    public float RaceProgress => waypointPath == null || waypointPath.WaypointCount == 0
+        ? 0f
+        : (float)currentWaypointIndex / waypointPath.WaypointCount;
+
+    public void ReceiveHotspotInformation()
+    {
+    }
+
+    public void ResetDriver()
+    {
+        StopAllCoroutines();
+        recoveringFromCollision = false;
+
+        int count = waypointPath.WaypointCount;
+        int previousIndex = (currentWaypointIndex - 1 + count) % count;
+        Vector3 respawnPosition = waypointPath.GetCurrentWaypoint(previousIndex).position;
+        Vector3 lookDirection = waypointPath.GetCurrentWaypoint(currentWaypointIndex).position - respawnPosition;
+        lookDirection.y = 0f;
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.position = respawnPosition;
+        if (lookDirection != Vector3.zero)
+        {
+            rb.rotation = Quaternion.LookRotation(lookDirection);
+        }
+
+        carController.Drive(0f, 0f);
+    }
+
+    // RacingDrivers Interface Implementation End
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
