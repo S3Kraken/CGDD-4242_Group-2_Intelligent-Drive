@@ -244,7 +244,7 @@ public class AggressiveBehaviour : MonoBehaviour, RacingDrivers
     }
     public void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "Ground" || collision.gameObject.name == "Road")
+        if (collision.gameObject.name.Contains("Ground") || collision.gameObject.name.Contains("Road"))
             return;
 
         if (collision.gameObject.CompareTag("Driver"))

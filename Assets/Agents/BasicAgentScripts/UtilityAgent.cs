@@ -340,7 +340,7 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
             return;
         }
 
-        if (collision.gameObject.name == "Ground" || collision.gameObject.name == "Road")
+        if (collision.gameObject.name.Contains("Ground") || collision.gameObject.name.Contains("Road"))
             return;
 
         StartCoroutine(RecoverFromCollision());

@@ -299,7 +299,7 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
     public void OnCollisionEnter(Collision collision)
     {
         //Ignore ground and road stuff
-        if (collision.gameObject.name == "Ground" || collision.gameObject.name == "Road")
+        if (collision.gameObject.name.Contains("Ground") || collision.gameObject.name.Contains("Road"))
             return;
 
 
