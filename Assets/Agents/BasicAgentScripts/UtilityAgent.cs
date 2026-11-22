@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class UtilityAgent : MonoBehaviour, RacingDrivers
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    //Start is called once before the first execution of Update after the MonoBehaviour is created
     //private Transform targetWaypointTransform;
 
     private CarController carController;
@@ -26,19 +26,56 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
     private bool isResetting = false;
 
     [Header("Utility tuning")]
-    [SerializeField] private bool usePads = true;           // untick for the waypoint-only baseline run
-    [SerializeField] private float detectionRadius = 40f;   // DETECTION_RADIUS (m)
-    [SerializeField] private float pObs = 5f;               // P_OBS (s)
-    [SerializeField] private float hCommit = 0.5f;          // H_COMMIT (s)
+    [SerializeField] private bool usePads = true;           //untick for the waypoint-only baseline run
+    [SerializeField] private float detectionRadius = 40f;   //DETECTION_RADIUS (m)
+    [SerializeField] private float pObs = 5f;               //P_OBS (s)
+    [SerializeField] private float hCommit = 0.5f;          //H_COMMIT (s)
 
     [Header("Movement tuning")]
     [SerializeField] private float reachedWaypointDistance = 10f;
-    [SerializeField] private float maxSteerAngle = 45f;     // MAX_STEER_ANGLE (degrees)
-    [SerializeField] private float slowdownFactor = 0.5f;   // SLOWDOWN_FACTOR
-    [SerializeField] private float rayAngle = 30f;          // angle of the left/right rays
-    [SerializeField] private float avoidDistance = 10f;     // AVOID_DISTANCE (m)
-    [SerializeField] private float avoidStrength = 0.8f;    // AVOID_STRENGTH
+    [SerializeField] private float maxSteerAngle = 45f;     //MAX_STEER_ANGLE (degrees)
+    [SerializeField] private float slowdownFactor = 0.5f;   //SLOWDOWN_FACTOR
+    [SerializeField] private float rayAngle = 30f;          //angle of the left/right rays
+    [SerializeField] private float avoidDistance = 10f;     //AVOID_DISTANCE (m)
+    [SerializeField] private float avoidStrength = 0.8f;    //AVOID_STRENGTH
     [SerializeField] private float carHalfWidth = 1.2f;
+
+    private int lapNumber = 1;
+
+    public int CurrentWaypoint => currentWaypointIndex;
+    public int LapNumber => lapNumber;
+    public float DistanceToWaypoint => Vector3.Distance(transform.position, currentWaypoint);
+    public Transform DriverTransform => transform;
+    public float RaceProgress => waypointPath == null || waypointPath.WaypointCount == 0
+        ? 0f
+        : (float)currentWaypointIndex / waypointPath.WaypointCount;
+
+    public void ReceiveHotspotInformation()
+    {
+    }
+
+    public void ResetDriver()
+    {
+        StopAllCoroutines();
+        recoveringFromCollision = false;
+
+        int count = waypointPath.WaypointCount;
+        int previousIndex = (currentWaypointIndex - 1 + count) % count;
+        Vector3 respawnPosition = waypointPath.GetCurrentWaypoint(previousIndex).position;
+        Vector3 lookDirection = waypointPath.GetCurrentWaypoint(currentWaypointIndex).position - respawnPosition;
+        lookDirection.y = 0f;
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.position = respawnPosition;
+        if (lookDirection != Vector3.zero)
+        {
+            rb.rotation = Quaternion.LookRotation(lookDirection);
+        }
+
+        carController.Drive(0f, 0f);
+    }
 
     //this is if you want the collision recovery
     #region collision recovery variables
@@ -145,6 +182,10 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
             {
                 lastWaypointIndex = currentWaypointIndex;
                 waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
+                if (currentWaypointIndex < previousWaypoint)
+                {
+                lapNumber++;
+                }
                 LogLap();
                 carController.Drive(0f, 0f);
             }
@@ -152,27 +193,6 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
 
         
     }
-
-    //private void MoveToward(Vector3 destination)
-    //{
-    //    Vector3 dirToDestination = (destination - transform.position).normalized;
-    //    float distance = Vector3.Distance(transform.position, destination);
-
-    //    // Drive forward, unless the destination is behind us and close: then reverse
-    //    float forwardAmount = 1f;
-    //    float dot = Vector3.Dot(transform.forward, dirToDestination);
-    //    float reverseDistance = 25f;
-    //    if (dot <= 0 && distance <= reverseDistance)
-    //    {
-    //        forwardAmount = -1f;
-    //    }
-
-    //    // Steer fully left or right toward the destination
-    //    float angleToDir = Vector3.SignedAngle(transform.forward, dirToDestination, Vector3.up);
-    //    float turnAmount = angleToDir > 0 ? 1f : -1f;
-
-    //    carController.Drive(turnAmount, forwardAmount);
-    //}
 
     private void MoveToward(Vector3 destination)
     {
@@ -271,7 +291,7 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
         Vector3 direction = toPad.normalized;
         float distance = toPad.magnitude;
 
-        // Sideways direction, measured across the line to the pad
+        //Sideways direction, measured across the line to the pad
         Vector3 side = Vector3.Cross(Vector3.up, direction);
 
         float[] offsets = { -carHalfWidth, 0f, carHalfWidth };
@@ -296,6 +316,43 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
         }
     }
 
+
+    ////This is completely optional, and it is if you want to have a recovery from collisions.
+    //private IEnumerator RecoverFromCollision()
+    //{
+    //    recoveringFromCollision = true;
+
+    //    // Step 1: Stop moving forward
+    //    carController.Drive(0f, 0f);
+
+    //    yield return new WaitForSeconds(0.3f);
+
+    //    // Step 2: Reverse away
+    //    carController.Drive(0f, -1f);
+
+    //    yield return new WaitForSeconds(recoveryReverseTime);
+
+    //    // Step 3: Steer away
+    //    carController.Drive(1f, 0f);
+
+    //    yield return new WaitForSeconds(recoveryTurnTime);
+
+    //    // Step 4: Return control to agent
+    //    carController.Drive(0f, 0f);
+
+    //    recoveringFromCollision = false;
+    //}
+    //public void OnCollisionEnter(Collision collision)
+    //{
+    //    if (recoveringFromCollision)
+    //    {
+    //        return;
+    //    }
+
+    //    StartCoroutine(RecoverFromCollision());
+
+    //    collisionsCount++;
+    //}
 
     //This is completely optional, and it is if you want to have a recovery from collisions.
     private IEnumerator RecoverFromCollision()
@@ -328,6 +385,9 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
         {
             return;
         }
+
+        if (collision.gameObject.name == "Ground" || collision.gameObject.name == "Road")
+            return;
 
         StartCoroutine(RecoverFromCollision());
 

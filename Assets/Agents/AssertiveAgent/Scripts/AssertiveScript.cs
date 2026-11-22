@@ -51,6 +51,9 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
     float truceCollisonTimeLimit = 20f;
     [SerializeField] bool truceMade;
 
+
+    // RacingDrivers Interface Implementation Start
+
     private int lapNumber = 1;
 
     public int CurrentWaypoint => currentWaypointIndex;
@@ -73,23 +76,38 @@ public class AssertiveScript : MonoBehaviour, RacingDrivers
         }
     }
 
-    public float RaceProgress
-    {
-        get
-        {
-            if (waypointPath == null || waypointPath.WaypointCount == 0)
-                return 0f;
+    public float RaceProgress => waypointPath == null || waypointPath.WaypointCount == 0
+        ? 0f
+        : (float)currentWaypointIndex / waypointPath.WaypointCount;
+    
 
-            return (float)currentWaypointIndex / waypointPath.WaypointCount;
-        }
-    }
+
     public void ResetDriver()
     {
         isResetting = true;
-        //driverCollider.enabled = false;
-        //transform.position = waypointPath.GetCurrentWaypoint(lastWaypointIndex).position;
-        //driverCollider.enabled = true;
+        StopAllCoroutines();
+        recoveringFromCollision = false;
+
+        int count = waypointPath.WaypointCount;
+        int previousIndex = (currentWaypointIndex - 1 + count) % count;
+        Vector3 respawnPosition = waypointPath.GetCurrentWaypoint(previousIndex).position;
+        Vector3 lookDirection = waypointPath.GetCurrentWaypoint(currentWaypointIndex).position - respawnPosition;
+        lookDirection.y = 0f;
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.position = respawnPosition;
+        if (lookDirection != Vector3.zero)
+        {
+            rb.rotation = Quaternion.LookRotation(lookDirection);
+        }
+
+        carController.Drive(0f, 0f);
     }
+
+    // RacingDrivers Interface Implementation End
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

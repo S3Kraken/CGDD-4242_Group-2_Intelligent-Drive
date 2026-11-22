@@ -34,11 +34,18 @@ public class SpeedPad : MonoBehaviour
 
         car.ApplyBoost(vBoost, tBoost);
 
+        SpeedPadSensor sensor = GetComponent<SpeedPadSensor>();
+        if (sensor != null)
+        {
+            sensor.PadCollected(car);
+        }
+
         UtilityAgent agent = other.GetComponent<UtilityAgent>();
         if (agent != null)
         {
             agent.OnPadCollected(this);
         }
+
         //Debug.Log("SPEED!");
         StartCoroutine(CooldownRoutine());
     }
