@@ -50,10 +50,6 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
         ? 0f
         : (float)currentWaypointIndex / waypointPath.WaypointCount;
 
-    public void ReceiveHotspotInformation()
-    {
-    }
-
     public void ResetDriver()
     {
         StopAllCoroutines();
@@ -85,48 +81,6 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
     public float recoveryReverseTime = 1.0f;
     public float recoveryTurnTime = 0.75f;
     #endregion
-
-    private int lapNumber = 1;
-
-    public int CurrentWaypoint => currentWaypointIndex;
-
-    public int LapNumber => lapNumber;
-
-    public float DistanceToWaypoint
-    {
-        get
-        {
-            if (waypointPath == null)
-                return 0f;
-
-            Transform waypoint =
-                waypointPath.GetCurrentWaypoint(currentWaypointIndex);
-
-            return Vector3.Distance(transform.position, waypoint.position);
-        }
-    }
-
-    public Transform DriverTransform => transform;
-
-    public float RaceProgress
-    {
-        get
-        {
-            if (waypointPath == null || waypointPath.WaypointCount == 0)
-                return 0f;
-
-            return (float)currentWaypointIndex /
-                   waypointPath.WaypointCount;
-        }
-    }
-    public void ResetDriver()
-    {
-        isResetting = true;
-        //driverCollider.enabled = false;
-        //transform.position = waypointPath.GetCurrentWaypoint(lastWaypointIndex).position;
-        //driverCollider.enabled = true;
-    }
-
     void Start()
     {
         carController = GetComponent<CarController>();
@@ -180,18 +134,18 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
             }
             else
             {
-                lastWaypointIndex = currentWaypointIndex;
+                int previousWaypoint = currentWaypointIndex;
                 waypointPath.WaypointReached(ref currentWaypointIndex, ref nextWaypointIndex);
                 if (currentWaypointIndex < previousWaypoint)
                 {
-                lapNumber++;
+                    lapNumber++;
                 }
                 LogLap();
                 carController.Drive(0f, 0f);
             }
         }
 
-        
+
     }
 
     private void MoveToward(Vector3 destination)
@@ -417,7 +371,7 @@ public class UtilityAgent : MonoBehaviour, RacingDrivers
     }
     public void ReceiveHotspotInformation()
     {
-      
+
     }
 }
 
